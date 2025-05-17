@@ -4,164 +4,181 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suuj Browser</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #74ebd5, #acb6e5);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            color: #333;
+            min-height: 100vh;
             transition: background 0.3s, color 0.3s;
         }
         body.dark-mode {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            color: #ecf0f1;
+            background: linear-gradient(135deg, #1f2937, #374151);
+            color: #f3f4f6;
         }
         #toolbar {
-            background: #2c3e50;
-            padding: 10px;
+            background: #111827;
+            padding: 0.5rem 1rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.5rem;
             flex-wrap: wrap;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         body.dark-mode #toolbar {
-            background: #1a252f;
+            background: #0f172a;
         }
         #urlInput {
             flex: 1;
-            padding: 10px;
-            font-size: 16px;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
             border: none;
-            border-radius: 20px;
-            background: #ecf0f1;
+            border-radius: 9999px;
+            background: #e5e7eb;
             min-width: 200px;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s, color 0.3s;
         }
         body.dark-mode #urlInput {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #374151;
+            color: #f3f4f6;
         }
         #urlInput:focus {
             outline: none;
-            background: #fff;
+            background: #ffffff;
         }
         body.dark-mode #urlInput:focus {
-            background: #4a6078;
-        }
-        #toolbar button {
-            padding: 10px 20px;
-            font-size: 14px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            background: #3498db;
-            color: white;
-            transition: background 0.3s, transform 0.1s;
-        }
-        #toolbar button:hover {
-            background: #2980b9;
-            transform: scale(1.05);
-        }
-        #downloadBtn {
-            background: #27ae60;
-        }
-        #downloadBtn:hover {
-            background: #219653;
-        }
-        #themeToggle {
-            background: #f1c40f;
-        }
-        #themeToggle:hover {
-            background: #d4ac0d;
+            background: #4b5563;
         }
         #tabsContainer {
-            background: #34495e;
-            padding: 5px;
+            background: #1f2937;
+            padding: 0.25rem;
             display: flex;
-            gap: 5px;
+            gap: 0.25rem;
             overflow-x: auto;
         }
         body.dark-mode #tabsContainer {
-            background: #1f2a38;
+            background: #111827;
         }
         .tab {
-            background: #7f8c8d;
-            padding: 10px 20px;
-            border-radius: 15px 15px 0 0;
+            background: #4b5563;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem 0.5rem 0 0;
             cursor: pointer;
-            position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: white;
+            gap: 0.5rem;
+            color: #d1d5db;
             transition: background 0.3s;
             user-select: none;
         }
         body.dark-mode .tab {
-            background: #95a5a6;
+            background: #6b7280;
         }
         .tab.active {
-            background: #ecf0f1;
-            color: #2c3e50;
-            font-weight: bold;
+            background: #ffffff;
+            color: #111827;
+            font-weight: 600;
         }
         body.dark-mode .tab.active {
-            background: #2c3e50;
-            color: #ecf0f1;
+            background: #1f2937;
+            color: #f3f4f6;
         }
         .tab:hover {
-            background: #95a5a6;
+            background: #6b7280;
         }
         body.dark-mode .tab:hover {
-            background: #b0bec5;
+            background: #9ca3af;
         }
         .tab .closeTab {
-            background: #e74c3c;
+            background: #ef4444;
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            line-height: 18px;
+            width: 1.125rem;
+            height: 1.125rem;
+            line-height: 1.125rem;
             text-align: center;
-            font-size: 12px;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: background 0.3s;
         }
         .tab .closeTab:hover {
-            background: #c0392b;
+            background: #dc2626;
         }
         #browserWindow {
             flex: 1;
             position: relative;
-            background: #fff;
-            border-radius: 10px;
-            margin: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            border-radius: 0.5rem;
+            margin: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         body.dark-mode #browserWindow {
-            background: #2c3e50;
+            background: #1f2937;
         }
-        .iframeContainer {
+        .siteContentContainer {
             display: none;
             width: 100%;
             height: 100%;
             position: absolute;
             top: 0;
             left: 0;
+            overflow-y: auto;
+            padding: 1.5rem;
+            box-sizing: border-box;
         }
-        .iframeContainer.active {
+        .siteContentContainer.active {
             display: block;
         }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 10px;
+        .siteContent {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background: #f9fafb;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        body.dark-mode .siteContent {
+            border-color: #4b5563;
+            background: #374151;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .siteContent img.favicon {
+            width: 1rem;
+            height: 1rem;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        .siteContent h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #1d4ed8;
+            display: inline;
+        }
+        body.dark-mode .siteContent h3 {
+            color: #60a5fa;
+        }
+        .siteContent p {
+            margin: 0.5rem 0;
+            color: #4b5563;
+        }
+        body.dark-mode .siteContent p {
+            color: #d1d5db;
+        }
+        .siteContent a {
+            color: #15803d;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+        body.dark-mode .siteContent a {
+            color: #34d399;
+        }
+        .siteContent a:hover {
+            text-decoration: underline;
         }
         #error {
             display: none;
@@ -169,17 +186,17 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #f1c1c1;
-            padding: 20px;
-            border-radius: 8px;
-            color: #333;
-            font-size: 16px;
+            background: #fee2e2;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            color: #b91c1c;
+            font-size: 1rem;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         body.dark-mode #error {
-            background: #e74c3c;
-            color: #ecf0f1;
+            background: #b91c1c;
+            color: #f3f4f6;
         }
         #searchResults, #newTabPage, #historyPanel, #bookmarksPanel {
             display: none;
@@ -188,17 +205,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #fff;
+            background: #ffffff;
             overflow-y: auto;
-            padding: 20px;
+            padding: 1.5rem;
             box-sizing: border-box;
-            border-radius: 10px;
+            border-radius: 0.5rem;
         }
         body.dark-mode #searchResults,
         body.dark-mode #newTabPage,
         body.dark-mode #historyPanel,
         body.dark-mode #bookmarksPanel {
-            background: #34495e;
+            background: #1f2937;
         }
         #newTabPage {
             display: flex;
@@ -208,125 +225,121 @@
             text-align: center;
         }
         #newTabPage h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
+            color: #111827;
+            margin-bottom: 1rem;
         }
         body.dark-mode #newTabPage h2 {
-            color: #ecf0f1;
-        }
-        .quickLink {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 5px;
-            background: #3498db;
-            color: white;
-            border-radius: 20px;
-            text-decoration: none;
-            transition: background 0.3s;
-        }
-        .quickLink:hover {
-            background: #2980b9;
+            color: #f3f4f6;
         }
         .searchResult, .historyItem, .bookmarkItem {
-            margin-bottom: 20px;
-            padding: 10px;
-            border-left: 3px solid #3498db;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem;
+            border-left: 3px solid #3b82f6;
+            animation: fadeIn 0.3s ease-in-out;
         }
         body.dark-mode .searchResult,
         body.dark-mode .historyItem,
         body.dark-mode .bookmarkItem {
-            border-left-color: #74ebd5;
+            border-left-color: #60a5fa;
         }
         .searchResult h3, .historyItem h3, .bookmarkItem h3 {
             margin: 0;
-            font-size: 18px;
-            color: #1a0dab;
+            font-size: 1.125rem;
+            color: #1d4ed8;
             cursor: pointer;
         }
         body.dark-mode .searchResult h3,
         body.dark-mode .historyItem h3,
         body.dark-mode .bookmarkItem h3 {
-            color: #74ebd5;
+            color: #60a5fa;
         }
         .searchResult h3:hover, .historyItem h3:hover, .bookmarkItem h3:hover {
             text-decoration: underline;
         }
         .searchResult p, .historyItem p, .bookmarkItem p {
-            margin: 5px 0;
-            color: #545454;
+            margin: 0.25rem 0;
+            color: #4b5563;
         }
         body.dark-mode .searchResult p,
         body.dark-mode .historyItem p,
         body.dark-mode .bookmarkItem p {
-            color: #b0bec5;
+            color: #d1d5db;
         }
         .searchResult a, .historyItem a, .bookmarkItem a {
-            color: #006621;
-            font-size: 14px;
+            color: #15803d;
+            font-size: 0.875rem;
         }
         body.dark-mode .searchResult a,
         body.dark-mode .historyItem a,
         body.dark-mode .bookmarkItem a {
-            color: #2ecc71;
+            color: #34d399;
         }
         .bookmarkItem button {
-            background: #e74c3c;
+            background: #ef4444;
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
             cursor: pointer;
-            margin-left: 10px;
+            margin-left: 0.5rem;
+            transition: background 0.3s;
         }
         .bookmarkItem button:hover {
-            background: #c0392b;
-        }
-        .retryLink {
-            color: #3498db;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-        .retryLink:hover {
-            color: #2980b9;
+            background: #dc2626;
         }
         .downloadAppBtn {
-            background: #27ae60;
+            background: #22c55e;
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
             cursor: pointer;
-            margin-left: 10px;
+            margin-left: 0.5rem;
+            transition: background 0.3s;
         }
         .downloadAppBtn:hover {
-            background: #219653;
+            background: #16a34a;
+        }
+        #userInfo {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode #userInfo {
+            background: rgba(0, 0, 0, 0.9);
+            color: #f3f4f6;
         }
     </style>
 </head>
-<body>
-    <div id="toolbar">
-        <button onclick="goBack()">Back</button>
-        <button onclick="goForward()">Forward</button>
-        <button onclick="refresh()">Refresh</button>
-        <button onclick="newTab()">New Tab</button>
-        <button onclick="showHistory()">History</button>
-        <button onclick="showBookmarks()">Bookmarks</button>
-        <button onclick="bookmarkCurrentPage()">Bookmark</button>
-        <button id="downloadBtn" onclick="downloadPage()">Download Page</button>
-        <button id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
-        <input type="text" id="urlInput" placeholder="Enter URL or search query..." onkeydown="if(event.key === 'Enter') searchOrNavigate()">
+<body class="bg-gradient-to-br from-blue-100 to-purple-100">
+    <div id="toolbar" class="sticky top-0 z-10">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105" onclick="goBack()">Back</button>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105" onclick="goForward()">Forward</button>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105" onclick="refresh()">Refresh</button>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105" onclick="newTab()">New Tab</button>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105" onclick="showHistory()">History</button>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105" onclick="showBookmarks()">Bookmarks</button>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105" onclick="bookmarkCurrentPage()">Bookmark</button>
+        <button id="themeToggle" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full transition transform hover:scale-105" onclick="toggleTheme()">Dark Mode</button>
+        <input type="text" id="urlInput" class="focus:ring-2 focus:ring-blue-500" placeholder="Enter URL or search query..." onkeydown="if(event.key === 'Enter') searchOrNavigate()">
     </div>
     <div id="tabsContainer"></div>
     <div id="browserWindow">
         <div id="error"></div>
+        <div id="userInfo"></div>
         <div id="searchResults"></div>
-        <div id="newTabPage">
-            <h2>Welcome to Suuj Browser</h2>
-            <div>
-                <a href="#" class="quickLink" onclick="navigate('https://www.example.com'); return false;">Example</a>
-                <a href="#" class="quickLink" onclick="navigate('https://www.wikipedia.org'); return false;">Wikipedia</a>
-                <a href="#" class="quickLink" onclick="navigate('https://www.github.com'); return false;">GitHub</a>
-                <a href="#" class="quickLink" onclick="navigate('https://www.stackoverflow.com'); return false;">Stack Overflow</a>
+        <div id="newTabPage" class="flex flex-col items-center justify-center text-center">
+            <h2 class="text-2xl font-bold">Welcome to Suuj Browser</h2>
+            <p class="mt-2">Search for any website or enter a URL to get started.</p>
+            <div class="mt-4">
+                <a href="#" class="quickLink bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105 mx-1" onclick="navigate('https://www.example.com'); return false;">Example</a>
+                <a href="#" class="quickLink bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105 mx-1" onclick="navigate('https://www.wikipedia.org'); return false;">Wikipedia</a>
+                <a href="#" class="quickLink bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition transform hover:scale-105 mx-1" onclick="navigate('https://www.github.com'); return false;">GitHub</a>
             </div>
         </div>
         <div id="historyPanel"></div>
@@ -338,55 +351,9 @@
         let currentTabIndex = -1;
         let historyList = JSON.parse(localStorage.getItem('browserHistory')) || [];
         let bookmarks = JSON.parse(localStorage.getItem('browserBookmarks')) || [];
+        let searchCache = JSON.parse(localStorage.getItem('searchCache')) || {};
 
-        // Expanded mock search results database with app download links
-        const mockSearchResults = [
-            { url: "https://www.google.com", title: "Google", description: "Google Search, a web search engine developed by Google.", appLink: "https://play.google.com/store/apps/details?id=com.google.android.googlequicksearchbox" },
-            { url: "https://www.example.com", title: "Example Domain", description: "This domain is for use in illustrative examples in documents.", appLink: null },
-            { url: "https://www.wikipedia.org", title: "Wikipedia", description: "Wikipedia is a free online encyclopedia, created and edited by volunteers.", appLink: "https://play.google.com/store/apps/details?id=org.wikipedia" },
-            { url: "https://www.github.com", title: "GitHub", description: "GitHub is a platform for version control and collaborative software development.", appLink: "https://play.google.com/store/apps/details?id=com.github.android" },
-            { url: "https://www.stackoverflow.com", title: "Stack Overflow", description: "Stack Overflow is a question and answer site for programmers.", appLink: null },
-            { url: "https://www.w3schools.com", title: "W3Schools", description: "W3Schools offers free online tutorials, references, and exercises in web technologies.", appLink: null },
-            { url: "https://www.bbc.com", title: "BBC", description: "The British Broadcasting Corporation provides news, entertainment, and educational content.", appLink: "https://play.google.com/store/apps/details?id=bbc.mobile.news.ww" },
-            { url: "https://www.khanacademy.org", title: "Khan Academy", description: "Khan Academy offers free online courses, lessons, and practice in various subjects.", appLink: "https://play.google.com/store/apps/details?id=org.khanacademy.android" },
-            { url: "https://www.scholarships.com", title: "Scholarships.com", description: "Find scholarships, grants, and financial aid for students.", appLink: null },
-            { url: "https://www.fastweb.com", title: "Fastweb Scholarships", description: "Fastweb helps students find scholarships and financial aid for college.", appLink: null },
-            { url: "https://www.chegg.com/scholarships", title: "Chegg Scholarships", description: "Chegg offers a variety of scholarships for high school and college students.", appLink: "https://play.google.com/store/apps/details?id=com.chegg" },
-            { url: "https://www.unigo.com", title: "Unigo Scholarships", description: "Unigo provides scholarship opportunities and college search tools.", appLink: null },
-            { url: "https://www.cappex.com", title: "Cappex Scholarships", description: "Cappex connects students with scholarships and colleges.", appLink: null },
-            { url: "https://www.scholarshipowl.com", title: "ScholarshipOwl", description: "ScholarshipOwl automates the scholarship application process for students.", appLink: null },
-            { url: "https://www.niche.com/scholarships", title: "Niche Scholarships", description: "Niche offers scholarships and helps students find the right college.", appLink: null },
-            { url: "https://www.petersons.com/scholarships", title: "Peterson's Scholarships", description: "Peterson's provides scholarship search tools for students.", appLink: null },
-            { url: "https://www.youtube.com", title: "YouTube", description: "YouTube is a global online video-sharing and social media platform.", appLink: "https://play.google.com/store/apps/details?id=com.google.android.youtube" },
-            { url: "https://www.reddit.com", title: "Reddit", description: "Reddit is a social news aggregation, web content rating, and discussion website.", appLink: "https://play.google.com/store/apps/details?id=com.reddit.frontpage" },
-            { url: "https://www.quora.com", title: "Quora", description: "Quora is a question-and-answer website where users can ask and answer questions.", appLink: "https://play.google.com/store/apps/details?id=com.quora.android" },
-            { url: "https://www.medium.com", title: "Medium", description: "Medium is an online publishing platform where users can read and write articles.", appLink: "https://play.google.com/store/apps/details?id=com.medium.reader" },
-            { url: "https://www.amazon.com", title: "Amazon", description: "Amazon is an online marketplace for shopping, cloud computing, and more.", appLink: "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping" },
-            { url: "https://www.netflix.com", title: "Netflix", description: "Netflix is a streaming service for movies, TV shows, and original content.", appLink: "https://play.google.com/store/apps/details?id=com.netflix.mediaclient" },
-            { url: "https://www.twitter.com", title: "Twitter", description: "Twitter is a social media platform for sharing and networking.", appLink: "https://play.google.com/store/apps/details?id=com.twitter.android" },
-            { url: "https://www.facebook.com", title: "Facebook", description: "Facebook is a social networking site for connecting with friends and family.", appLink: "https://play.google.com/store/apps/details?id=com.facebook.katana" },
-            { url: "https://www.instagram.com", title: "Instagram", description: "Instagram is a photo and video-sharing social networking service.", appLink: "https://play.google.com/store/apps/details?id=com.instagram.android" },
-            { url: "https://www.linkedin.com", title: "LinkedIn", description: "LinkedIn is a professional networking platform for job seekers and businesses.", appLink: "https://play.google.com/store/apps/details?id=com.linkedin.android" },
-            { url: "https://www.tiktok.com", title: "TikTok", description: "TikTok is a platform for creating and sharing short-form videos.", appLink: "https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically" },
-            { url: "https://www.snapchat.com", title: "Snapchat", description: "Snapchat is a multimedia messaging app with ephemeral messages.", appLink: "https://play.google.com/store/apps/details?id=com.snapchat.android" },
-            { url: "https://www.pinterest.com", title: "Pinterest", description: "Pinterest is a visual discovery engine for finding ideas like recipes, home decor, and more.", appLink: "https://play.google.com/store/apps/details?id=com.pinterest" },
-            { url: "https://www.ebay.com", title: "eBay", description: "eBay is an online marketplace for buying and selling goods.", appLink: "https://play.google.com/store/apps/details?id=com.ebay.mobile" },
-            { url: "https://www.walmart.com", title: "Walmart", description: "Walmart is a retail corporation offering a wide range of products online.", appLink: "https://play.google.com/store/apps/details?id=com.walmart.android" },
-            { url: "https://www.etsy.com", title: "Etsy", description: "Etsy is a marketplace for handmade, vintage, and unique items.", appLink: "https://play.google.com/store/apps/details?id=com.etsy.android" },
-            { url: "https://www.nytimes.com", title: "The New York Times", description: "The New York Times provides breaking news, multimedia, and opinion pieces.", appLink: "https://play.google.com/store/apps/details?id=com.nytimes.android" },
-            { url: "https://www.cnn.com", title: "CNN", description: "CNN delivers breaking news and in-depth reporting from around the world.", appLink: "https://play.google.com/store/apps/details?id=com.cnn.mobile.android.phone" },
-            { url: "https://www.theguardian.com", title: "The Guardian", description: "The Guardian offers independent journalism and global news coverage.", appLink: "https://play.google.com/store/apps/details?id=com.guardian" },
-            { url: "https://www.spotify.com", title: "Spotify", description: "Spotify is a music streaming service with millions of songs and podcasts.", appLink: "https://play.google.com/store/apps/details?id=com.spotify.music" },
-            { url: "https://www.apple.com/music", title: "Apple Music", description: "Apple Music is a streaming service for music and exclusive content.", appLink: "https://play.google.com/store/apps/details?id=com.apple.android.music" },
-            { url: "https://www.deezer.com", title: "Deezer", description: "Deezer is a music streaming service with a vast library of songs.", appLink: "https://play.google.com/store/apps/details?id=deezer.android.app" },
-            { url: "https://www.duolingo.com", title: "Duolingo", description: "Duolingo is a language-learning app with gamified lessons.", appLink: "https://play.google.com/store/apps/details?id=com.duolingo" },
-            { url: "https://www.coursera.org", title: "Coursera", description: "Coursera offers online courses, degrees, and certificates from top universities.", appLink: "https://play.google.com/store/apps/details?id=org.coursera.android" },
-            { url: "https://www.udemy.com", title: "Udemy", description: "Udemy provides online courses on a wide range of topics.", appLink: "https://play.google.com/store/apps/details?id=com.udemy.android" },
-            { url: "https://www.weather.com", title: "The Weather Channel", description: "The Weather Channel provides weather forecasts and updates.", appLink: "https://play.google.com/store/apps/details?id=com.weather.Weather" },
-            { url: "https://www.accuweather.com", title: "AccuWeather", description: "AccuWeather offers weather forecasts with minute-by-minute updates.", appLink: "https://play.google.com/store/apps/details?id=com.accuweather.android" }
-        ];
-
-        // Load saved tabs and theme on page load
+        // Load saved tabs, theme, and user info on page load
         window.onload = function() {
             const savedTabs = localStorage.getItem('browserTabs');
             const savedTheme = localStorage.getItem('browserTheme');
@@ -407,14 +374,29 @@
                 showNewTabPage();
             }
             makeTabsDraggable();
+            fetchUserInfo();
         };
+
+        // Fetch user location and display info
+        function fetchUserInfo() {
+            fetch('http://ip-api.com/json/')
+                .then(response => response.json())
+                .then(data => {
+                    const userInfoDiv = document.getElementById('userInfo');
+                    userInfoDiv.innerHTML = `Location: ${data.city}, ${data.country} | Time: ${new Date().toLocaleTimeString()}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching user info:', error);
+                    document.getElementById('userInfo').innerHTML = 'Location: Unknown | Time: ' + new Date().toLocaleTimeString();
+                });
+        }
 
         function showNewTabPage() {
             document.getElementById('newTabPage').style.display = 'flex';
             document.getElementById('searchResults').style.display = 'none';
             document.getElementById('historyPanel').style.display = 'none';
             document.getElementById('bookmarksPanel').style.display = 'none';
-            document.querySelectorAll('.iframeContainer').forEach(container => {
+            document.querySelectorAll('.siteContentContainer').forEach(container => {
                 if (container) container.classList.remove('active');
             });
         }
@@ -426,15 +408,10 @@
             currentTabIndex = tabs.length - 1;
 
             if (url) {
-                const iframeContainer = document.createElement('div');
-                iframeContainer.className = 'iframeContainer';
-                iframeContainer.id = `iframe-${tabId}`;
-                const iframe = document.createElement('iframe');
-                iframe.src = url;
-                iframe.sandbox = 'allow-same-origin allow-scripts';
-                iframe.setAttribute('referrerpolicy', 'no-referrer');
-                iframeContainer.appendChild(iframe);
-                document.getElementById('browserWindow').appendChild(iframeContainer);
+                const contentContainer = document.createElement('div');
+                contentContainer.className = 'siteContentContainer';
+                contentContainer.id = `content-${tabId}`;
+                document.getElementById('browserWindow').appendChild(contentContainer);
             }
 
             renderTabs();
@@ -500,7 +477,7 @@
             currentTabIndex = index;
             const tab = tabs[index];
 
-            document.querySelectorAll('.iframeContainer').forEach(container => {
+            document.querySelectorAll('.siteContentContainer').forEach(container => {
                 if (container) container.classList.remove('active');
             });
             document.querySelectorAll('.tab').forEach(tab => {
@@ -515,34 +492,15 @@
             if (tab.url === 'about:newtab') {
                 showNewTabPage();
             } else {
-                let iframeContainer = document.getElementById(`iframe-${tab.id}`);
-                if (!iframeContainer) {
-                    iframeContainer = document.createElement('div');
-                    iframeContainer.className = 'iframeContainer';
-                    iframeContainer.id = `iframe-${tab.id}`;
-                    const iframe = document.createElement('iframe');
-                    iframe.src = tab.url;
-                    iframe.sandbox = 'allow-same-origin allow-scripts';
-                    iframe.setAttribute('referrerpolicy', 'no-referrer');
-                    iframeContainer.appendChild(iframe);
-                    document.getElementById('browserWindow').appendChild(iframeContainer);
+                let contentContainer = document.getElementById(`content-${tab.id}`);
+                if (!contentContainer) {
+                    contentContainer = document.createElement('div');
+                    contentContainer.className = 'siteContentContainer';
+                    contentContainer.id = `content-${tab.id}`;
+                    document.getElementById('browserWindow').appendChild(contentContainer);
                 }
-
-                iframeContainer.classList.add('active');
-                const iframe = iframeContainer.querySelector('iframe');
-                if (iframe) {
-                    let loadTimeout = setTimeout(() => {
-                        showError(`Failed to load ${tab.url}. This site may block embedding. <span class="retryLink" onclick="navigate('${tab.url}')">Try again</span> or search for the site to see more details.`);
-                    }, 3000);
-                    iframe.onload = () => {
-                        clearTimeout(loadTimeout);
-                        hideError();
-                    };
-                    iframe.onerror = () => {
-                        clearTimeout(loadTimeout);
-                        showError(`Failed to load ${tab.url}. This site may block embedding. <span class="retryLink" onclick="navigate('${tab.url}')">Try again</span> or search for the site to see more details.`);
-                    };
-                }
+                contentContainer.classList.add('active');
+                renderSiteContent(tab.url, contentContainer);
             }
 
             const tabElement = document.getElementsByClassName('tab')[index];
@@ -552,8 +510,8 @@
 
         function closeTab(index) {
             const tabId = tabs[index].id;
-            const iframeContainer = document.getElementById(`iframe-${tabId}`);
-            if (iframeContainer) iframeContainer.remove();
+            const contentContainer = document.getElementById(`content-${tabId}`);
+            if (contentContainer) contentContainer.remove();
             tabs.splice(index, 1);
             if (tabs.length === 0) {
                 currentTabIndex = -1;
@@ -587,50 +545,136 @@
 
         function performSearch(query) {
             const searchResultsDiv = document.getElementById('searchResults');
-            searchResultsDiv.innerHTML = '';
+            searchResultsDiv.innerHTML = '<p>Searching...</p>';
             searchResultsDiv.style.display = 'block';
 
             document.getElementById('newTabPage').style.display = 'none';
             document.getElementById('historyPanel').style.display = 'none';
             document.getElementById('bookmarksPanel').style.display = 'none';
-            document.querySelectorAll('.iframeContainer').forEach(container => {
+            document.querySelectorAll('.siteContentContainer').forEach(container => {
                 if (container) container.classList.remove('active');
             });
 
-            const results = mockSearchResults.filter(result => 
-                result.title.toLowerCase().includes(query.toLowerCase()) || 
-                result.description.toLowerCase().includes(query.toLowerCase()) ||
-                result.url.toLowerCase().includes(query.toLowerCase())
-            );
-
-            if (results.length === 0) {
-                const assumedUrl = `https://${query.replace(/\s+/g, '')}.com`;
-                searchResultsDiv.innerHTML = `
-                    <p>No results found for "${query}" in Suuj Browser.</p>
-                    <p>Try navigating to the site directly:</p>
-                    <div class="searchResult">
-                        <a href="${assumedUrl}">${assumedUrl}</a>
-                        <h3 onclick="navigate('${assumedUrl}')">${query} (Assumed Site)</h3>
-                        <p>Browser: Suuj Browser</p>
-                        <p>This site may not be in our database. Navigate to explore it.</p>
-                        <button class="downloadAppBtn" onclick="downloadApp('${query}', '${assumedUrl}')">Download as App</button>
-                    </div>
-                `;
+            // Check cache first
+            if (searchCache[query]) {
+                renderSearchResults(searchCache[query], query);
                 return;
             }
 
+            // Use DuckDuckGo API for real-time search
+            fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`)
+                .then(response => response.json())
+                .then(data => {
+                    const results = data.RelatedTopics.filter(topic => topic.FirstURL);
+                    if (results.length === 0) {
+                        // Fallback: Try assuming a URL with different TLDs
+                        const tlds = ['.com', '.org', '.net', '.edu', '.gov'];
+                        const assumedUrls = tlds.map(tld => `https://${query.replace(/\s+/g, '')}${tld}`);
+                        const assumedResults = assumedUrls.map(url => ({
+                            FirstURL: url,
+                            Text: `${query} (Assumed Site) - This site may not be in our database. Navigate to explore it.`
+                        }));
+                        searchCache[query] = assumedResults;
+                        localStorage.setItem('searchCache', JSON.stringify(searchCache));
+                        renderSearchResults(assumedResults, query);
+                        return;
+                    }
+
+                    searchCache[query] = results;
+                    localStorage.setItem('searchCache', JSON.stringify(searchCache));
+                    renderSearchResults(results, query);
+                })
+                .catch(error => {
+                    console.error('Error fetching search results:', error);
+                    // Fallback: Assume a URL if search fails
+                    const assumedUrl = `https://${query.replace(/\s+/g, '')}.com`;
+                    const assumedResults = [{
+                        FirstURL: assumedUrl,
+                        Text: `${query} (Assumed Site) - This site may not be in our database. Navigate to explore it.`
+                    }];
+                    searchCache[query] = assumedResults;
+                    localStorage.setItem('searchCache', JSON.stringify(searchCache));
+                    renderSearchResults(assumedResults, query);
+                });
+        }
+
+        function renderSearchResults(results, query) {
+            const searchResultsDiv = document.getElementById('searchResults');
+            searchResultsDiv.innerHTML = '';
+
             results.forEach(result => {
+                const url = result.FirstURL;
+                const title = result.Text.split(' - ')[0];
+                const description = result.Text;
+                const favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
+
                 const resultDiv = document.createElement('div');
                 resultDiv.className = 'searchResult';
                 resultDiv.innerHTML = `
-                    <a href="${result.url}">${result.url}</a>
-                    <h3 onclick="navigate('${result.url}')">${result.title}</h3>
+                    <a href="${url}" onclick="navigate('${url}'); return false;">${url}</a>
+                    <h3 onclick="navigate('${url}')"><img src="${favicon}" alt="Favicon" class="favicon">${title}</h3>
                     <p>Browser: Suuj Browser</p>
-                    <p>${result.description}</p>
-                    <button class="downloadAppBtn" onclick="downloadApp('${result.title}', '${result.url}', '${result.appLink || ''}')">Download as App</button>
+                    <p>${description}</p>
+                    <button class="downloadAppBtn" onclick="downloadApp('${title}', '${url}')">Download as App</button>
                 `;
                 searchResultsDiv.appendChild(resultDiv);
             });
+        }
+
+        function renderSiteContent(url, container) {
+            container.innerHTML = '<p>Loading content...</p>';
+
+            // Fetch site content using a CORS proxy
+            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data.contents, 'text/html');
+                    const title = doc.querySelector('title')?.textContent || new URL(url).hostname;
+                    const description = doc.querySelector('meta[name="description"]')?.content || 'No description available.';
+                    const favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
+
+                    // Extract some basic content (e.g., text from paragraphs)
+                    const paragraphs = Array.from(doc.querySelectorAll('p')).map(p => p.textContent).join('<br>');
+                    const content = paragraphs || 'No additional content available.';
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'siteContent';
+                    contentDiv.innerHTML = `
+                        <a href="${url}" onclick="navigate('${url}'); return false;">${url}</a>
+                        <h3><img src="${favicon}" alt="Favicon" class="favicon">${title}</h3>
+                        <p>${description}</p>
+                        <p>Browser: Suuj Browser</p>
+                        <div class="extracted-content">${content}</div>
+                        <button class="downloadAppBtn" onclick="downloadApp('${title}', '${url}')">Download as App</button>
+                    `;
+
+                    // Intercept all link clicks within the content
+                    contentDiv.querySelectorAll('a').forEach(link => {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const href = link.getAttribute('href');
+                            if (href && !href.startsWith('#')) {
+                                navigate(href.startsWith('http') ? href : new URL(href, url).href);
+                            }
+                        });
+                    });
+
+                    container.innerHTML = '';
+                    container.appendChild(contentDiv);
+                })
+                .catch(error => {
+                    console.error('Error fetching site content:', error);
+                    container.innerHTML = `
+                        <div class="siteContent">
+                            <a href="${url}" onclick="navigate('${url}'); return false;">${url}</a>
+                            <h3>${new URL(url).hostname}</h3>
+                            <p>Unable to load content for this site.</p>
+                            <p>Browser: Suuj Browser</p>
+                            <button class="downloadAppBtn" onclick="downloadApp('${new URL(url).hostname}', '${url}')">Download as App</button>
+                        </div>
+                    `;
+                });
         }
 
         function downloadApp(siteName, siteUrl, appLink) {
@@ -651,59 +695,38 @@
 
         function navigate(url) {
             let tab = tabs[currentTabIndex];
-            let iframeContainer = document.getElementById(`iframe-${tab.id}`);
+            let contentContainer = document.getElementById(`content-${tab.id}`);
 
-            if (tab.url === 'about:newtab' || !iframeContainer) {
+            if (tab.url === 'about:newtab' || !contentContainer) {
                 const tabId = tab.id;
-                iframeContainer = document.createElement('div');
-                iframeContainer.className = 'iframeContainer';
-                iframeContainer.id = `iframe-${tabId}`;
-                const iframe = document.createElement('iframe');
-                iframe.src = url;
-                iframe.sandbox = 'allow-same-origin allow-scripts';
-                iframe.setAttribute('referrerpolicy', 'no-referrer');
-                iframeContainer.appendChild(iframe);
-                document.getElementById('browserWindow').appendChild(iframeContainer);
+                contentContainer = document.createElement('div');
+                contentContainer.className = 'siteContentContainer';
+                contentContainer.id = `content-${tabId}`;
+                document.getElementById('browserWindow').appendChild(contentContainer);
             }
 
             tab.url = url;
-            const iframe = iframeContainer.querySelector('iframe');
-            if (iframe) {
-                iframe.src = url;
+            contentContainer.classList.add('active');
 
-                tab.history = tab.history.slice(0, tab.historyIndex + 1);
-                tab.history.push(url);
-                tab.historyIndex = tab.history.length - 1;
+            tab.history = tab.history.slice(0, tab.historyIndex + 1);
+            tab.history.push(url);
+            tab.historyIndex = tab.history.length - 1;
 
-                const siteInfo = mockSearchResults.find(result => result.url === url) || {};
-                historyList.push({
-                    url: url,
-                    title: siteInfo.title || new URL(url).hostname,
-                    timestamp: new Date().toLocaleString()
-                });
-                localStorage.setItem('browserHistory', JSON.stringify(historyList));
+            historyList.push({
+                url: url,
+                title: new URL(url).hostname,
+                timestamp: new Date().toLocaleString()
+            });
+            localStorage.setItem('browserHistory', JSON.stringify(historyList));
 
-                document.getElementById('urlInput').value = url;
-                document.getElementById('searchResults').style.display = 'none';
-                document.getElementById('historyPanel').style.display = 'none';
-                document.getElementById('bookmarksPanel').style.display = 'none';
-                renderTabs();
-                backupTabs();
+            document.getElementById('urlInput').value = url;
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('historyPanel').style.display = 'none';
+            document.getElementById('bookmarksPanel').style.display = 'none';
+            renderTabs();
+            backupTabs();
 
-                let loadTimeout = setTimeout(() => {
-                    showError(`Failed to load ${url}. This site may block embedding. <span class="retryLink" onclick="navigate('${url}')">Try again</span> or search for the site to see more details.`);
-                }, 3000);
-                iframe.onload = () => {
-                    clearTimeout(loadTimeout);
-                    hideError();
-                };
-                iframe.onerror = () => {
-                    clearTimeout(loadTimeout);
-                    showError(`Failed to load ${url}. This site may block embedding. <span class="retryLink" onclick="navigate('${url}')">Try again</span> or search for the site to see more details.`);
-                };
-            } else {
-                showError('Error: Unable to create iframe for navigation.');
-            }
+            renderSiteContent(url, contentContainer);
         }
 
         function goBack() {
@@ -711,14 +734,11 @@
             if (tab.historyIndex > 0) {
                 tab.historyIndex--;
                 tab.url = tab.history[tab.historyIndex];
-                const iframeContainer = document.getElementById(`iframe-${tab.id}`);
-                if (iframeContainer) {
-                    const iframe = iframeContainer.querySelector('iframe');
-                    if (iframe) {
-                        iframe.src = tab.url;
-                        document.getElementById('urlInput').value = tab.url;
-                        renderTabs();
-                    }
+                const contentContainer = document.getElementById(`content-${tab.id}`);
+                if (contentContainer) {
+                    renderSiteContent(tab.url, contentContainer);
+                    document.getElementById('urlInput').value = tab.url;
+                    renderTabs();
                 }
             }
         }
@@ -728,14 +748,11 @@
             if (tab.historyIndex < tab.history.length - 1) {
                 tab.historyIndex++;
                 tab.url = tab.history[tab.historyIndex];
-                const iframeContainer = document.getElementById(`iframe-${tab.id}`);
-                if (iframeContainer) {
-                    const iframe = iframeContainer.querySelector('iframe');
-                    if (iframe) {
-                        iframe.src = tab.url;
-                        document.getElementById('urlInput').value = tab.url;
-                        renderTabs();
-                    }
+                const contentContainer = document.getElementById(`content-${tab.id}`);
+                if (contentContainer) {
+                    renderSiteContent(tab.url, contentContainer);
+                    document.getElementById('urlInput').value = tab.url;
+                    renderTabs();
                 }
             }
         }
@@ -743,12 +760,9 @@
         function refresh() {
             const tab = tabs[currentTabIndex];
             if (tab.url === 'about:newtab') return;
-            const iframeContainer = document.getElementById(`iframe-${tab.id}`);
-            if (iframeContainer) {
-                const iframe = iframeContainer.querySelector('iframe');
-                if (iframe) {
-                    iframe.src = tab.url;
-                }
+            const contentContainer = document.getElementById(`content-${tab.id}`);
+            if (contentContainer) {
+                renderSiteContent(tab.url, contentContainer);
             }
         }
 
@@ -756,72 +770,15 @@
             localStorage.setItem('browserTabs', JSON.stringify(tabs));
         }
 
-        function restoreTabs() {
-            const savedTabs = localStorage.getItem('browserTabs');
-            if (savedTabs) {
-                tabs = JSON.parse(savedTabs);
-                document.querySelectorAll('.iframeContainer').forEach(container => container.remove());
-                currentTabIndex = 0;
-                tabs.forEach(tab => {
-                    if (tab.url !== 'about:newtab') {
-                        const iframeContainer = document.createElement('div');
-                        iframeContainer.className = 'iframeContainer';
-                        iframeContainer.id = `iframe-${tab.id}`;
-                        const iframe = document.createElement('iframe');
-                        iframe.src = tab.url;
-                        iframe.sandbox = 'allow-same-origin allow-scripts';
-                        iframe.setAttribute('referrerpolicy', 'no-referrer');
-                        iframeContainer.appendChild(iframe);
-                        document.getElementById('browserWindow').appendChild(iframeContainer);
-                    }
-                });
-                renderTabs();
-                switchTab(0);
-            }
-        }
-
-        function downloadPage() {
-            const tab = tabs[currentTabIndex];
-            const errorDiv = document.getElementById('error');
-
-            if (tab.url === 'about:newtab') {
-                showError('No page to download. Navigate to a website first.');
-                return;
-            }
-
-            try {
-                const siteInfo = mockSearchResults.find(result => result.url === tab.url) || {};
-                const content = `
-URL: ${tab.url}
-Title: ${siteInfo.title || 'Unknown'}
-Description: ${siteInfo.description || 'No description available.'}
-
-Note: Direct content download is restricted due to security policies.
-                `;
-                const blob = new Blob([content], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${new URL(tab.url).hostname || 'page'}_info.txt`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('Error downloading page:', error);
-                showError('Error downloading page info.');
-            }
-        }
-
         function showHistory() {
             const historyPanel = document.getElementById('historyPanel');
-            historyPanel.innerHTML = '<h2>Browsing History</h2>';
+            historyPanel.innerHTML = '<h2 class="text-xl font-bold mb-4">Browsing History</h2>';
             historyPanel.style.display = 'block';
 
             document.getElementById('newTabPage').style.display = 'none';
             document.getElementById('searchResults').style.display = 'none';
             document.getElementById('bookmarksPanel').style.display = 'none';
-            document.querySelectorAll('.iframeContainer').forEach(container => {
+            document.querySelectorAll('.siteContentContainer').forEach(container => {
                 if (container) container.classList.remove('active');
             });
 
@@ -834,7 +791,7 @@ Note: Direct content download is restricted due to security policies.
                 const historyDiv = document.createElement('div');
                 historyDiv.className = 'historyItem';
                 historyDiv.innerHTML = `
-                    <a href="${item.url}">${item.url}</a>
+                    <a href="${item.url}" onclick="navigate('${item.url}'); return false;">${item.url}</a>
                     <h3 onclick="navigate('${item.url}')">${item.title}</h3>
                     <p>Visited: ${item.timestamp}</p>
                 `;
@@ -844,13 +801,13 @@ Note: Direct content download is restricted due to security policies.
 
         function showBookmarks() {
             const bookmarksPanel = document.getElementById('bookmarksPanel');
-            bookmarksPanel.innerHTML = '<h2>Bookmarks</h2>';
+            bookmarksPanel.innerHTML = '<h2 class="text-xl font-bold mb-4">Bookmarks</h2>';
             bookmarksPanel.style.display = 'block';
 
             document.getElementById('newTabPage').style.display = 'none';
             document.getElementById('searchResults').style.display = 'none';
             document.getElementById('historyPanel').style.display = 'none';
-            document.querySelectorAll('.iframeContainer').forEach(container => {
+            document.querySelectorAll('.siteContentContainer').forEach(container => {
                 if (container) container.classList.remove('active');
             });
 
@@ -863,7 +820,7 @@ Note: Direct content download is restricted due to security policies.
                 const bookmarkDiv = document.createElement('div');
                 bookmarkDiv.className = 'bookmarkItem';
                 bookmarkDiv.innerHTML = `
-                    <a href="${bookmark.url}">${bookmark.url}</a>
+                    <a href="${bookmark.url}" onclick="navigate('${bookmark.url}'); return false;">${bookmark.url}</a>
                     <h3 onclick="navigate('${bookmark.url}')">${bookmark.title}</h3>
                     <button onclick="removeBookmark(${index})">Remove</button>
                 `;
@@ -878,10 +835,9 @@ Note: Direct content download is restricted due to security policies.
                 return;
             }
 
-            const siteInfo = mockSearchResults.find(result => result.url === tab.url) || {};
             bookmarks.push({
                 url: tab.url,
-                title: siteInfo.title || new URL(tab.url).hostname
+                title: new URL(tab.url).hostname
             });
             localStorage.setItem('browserBookmarks', JSON.stringify(bookmarks));
             showBookmarks();
