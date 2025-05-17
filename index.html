@@ -413,7 +413,7 @@
             <button class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-full text-sm" onclick="closeFindBar()">Close</button>
         </div>
         <div id="searchResults"></div>
-        <div id="newTabPage" class="flex flex-col items-center justify-center text-center">
+        <div id="newTabPage" class="flex flex-col items-center justify-content text-center">
             <h2 class="text-2xl font-bold">Welcome to Suuj Browser</h2>
             <p class="mt-2">Search for any website or enter a URL to get started.</p>
             <div class="mt-4">
@@ -438,6 +438,14 @@
         let customHomepage = localStorage.getItem('customHomepage') || 'about:newtab';
         let isIncognito = false;
         let zoomLevel = 1;
+
+        // List of CORS proxies to try
+        const proxies = [
+            { url: 'https://api.allorigins.win/get?url=', name: 'AllOrigins' },
+            { url: 'https://corsproxy.io/?', name: 'CorsProxyIO' },
+            { url: 'https://thingproxy.freeboard.io/fetch/', name: 'ThingProxy' }
+            // Note: cors-anywhere.herokuapp.com requires hosting your own instance
+        ];
 
         // Load saved tabs, theme, and user info on page load
         window.onload = function() {
@@ -468,9 +476,18 @@
         // Register Service Worker for PWA
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registered', reg))
-                    .catch(err => console.error('Service Worker registration failed', err));
+                navigator.serviceWorker.register('sw.js', { scope: './' })
+                    .then(reg => {
+                        console.log('Service Worker registered', reg);
+                        showError('Service Worker registered successfully');
+                    })
+                    .catch(err => {
+                        console.error('Service Worker registration failed:', err);
+                        showError(`Service Worker registration failed: ${err.message}`);
+                    });
+            } else {
+                console.error('Service Workers not supported in this browser');
+                showError('Service Workers not supported in this browser');
             }
         }
 
@@ -733,27 +750,33 @@
             updateNavigationButtons();
         }
 
-        function fetchWithFallback(url, container, primaryProxy = true) {
-            const proxyUrl = primaryProxy ?
-                `https://api.allorigins.win/get?url=${encodeURIComponent(url)}` :
-                `https://corsproxy.io/?${encodeURIComponent(url)}`;
+        function fetchWithProxies(url, container, proxyIndex = 0) {
+            if (proxyIndex >= proxies.length) {
+                // All proxies failed, attempt a fallback using DuckDuckGo API
+                fetchSiteInfoFallback(url, container);
+                return;
+            }
+
+            const proxy = proxies[proxyIndex];
+            const proxyUrl = `${proxy.url}${encodeURIComponent(url)}`;
 
             fetch(proxyUrl)
                 .then(response => response.json())
                 .then(data => {
                     const parser = new DOMParser();
-                    const doc = parser.parseFromString(data.contents || data.data, 'text/html');
-                    const title = doc.querySelector('title')?.textContent || new URL(url).hostname;
+                    const doc = parser.parseFromString(data.contents || data.data || '', 'text/html');
+                    const title = doc.querySelector('title')?.textContent || doc.querySelector('meta[name="og:title"]')?.content || new URL(url).hostname;
                     const description = doc.querySelector('meta[name="description"]')?.content || doc.querySelector('meta[name="og:description"]')?.content || 'No description available.';
                     const favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
 
                     // Extract more elements for a richer view
                     const headings = Array.from(doc.querySelectorAll('h1, h2, h3')).map(h => `<h${h.tagName.charAt(1)}>${h.textContent}</h${h.tagName.charAt(1)}>`).join('');
+                    const articles = Array.from(doc.querySelectorAll('article')).map(article => `<div>${article.innerHTML}</div>`).join('');
                     const paragraphs = Array.from(doc.querySelectorAll('p')).map(p => `<p>${p.textContent}</p>`).join('');
                     const images = Array.from(doc.querySelectorAll('img')).filter(img => img.src).map(img => `<img src="${img.src}" alt="${img.alt || 'Image'}" class="extracted-image">`).join('');
                     const lists = Array.from(doc.querySelectorAll('ul, ol')).map(list => `<${list.tagName.toLowerCase()}>${Array.from(list.querySelectorAll('li')).map(li => `<li>${li.textContent}</li>`).join('')}</${list.tagName.toLowerCase()}>`).join('');
                     const tables = Array.from(doc.querySelectorAll('table')).map(table => `<table border="1">${Array.from(table.querySelectorAll('tr')).map(row => `<tr>${Array.from(row.querySelectorAll('td, th')).map(cell => `<${cell.tagName.toLowerCase()}>${cell.textContent}</${cell.tagName.toLowerCase()}>`).join('')}</tr>`).join('')}</table>`).join('');
-                    const content = (headings || paragraphs || images || lists || tables) ? `${headings}${paragraphs}${images}${lists}${tables}` : 'No additional content available.';
+                    const content = (headings || articles || paragraphs || images || lists || tables) ? `${headings}${articles}${paragraphs}${images}${lists}${tables}` : 'No additional content available.';
 
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'siteContent';
@@ -783,33 +806,62 @@
                     container.appendChild(contentDiv);
                 })
                 .catch(error => {
-                    console.error(`Error fetching site content with ${primaryProxy ? 'primary' : 'fallback'} proxy:`, error);
-                    if (primaryProxy) {
-                        // Try the fallback proxy
-                        fetchWithFallback(url, container, false);
-                    } else {
-                        // Both proxies failed
-                        container.innerHTML = `
-                            <div class="siteContent">
-                                <a href="${url}" onclick="navigate('${url}'); return false;">${url}</a>
-                                <h3>${new URL(url).hostname}</h3>
-                                <p>Unable to load content for this site. This may be due to security restrictions or connectivity issues.</p>
-                                <p>Browser: Suuj Browser</p>
-                                <p>
-                                    <a href="#" onclick="navigate('${url}'); return false;">Retry</a> |
-                                    <a href="#" onclick="performSearch('${new URL(url).hostname}'); return false;">Search for alternatives</a> |
-                                    <a href="${url}" onclick="navigate('${url}'); return false;">Visit site in Suuj Browser</a>
-                                </p>
-                                <button class="downloadAppBtn" onclick="downloadApp('${new URL(url).hostname}', '${url}')">Download as App</button>
-                            </div>
-                        `;
-                    }
+                    console.error(`Error fetching site content with ${proxy.name}:`, error);
+                    // Try the next proxy
+                    fetchWithProxies(url, container, proxyIndex + 1);
+                });
+        }
+
+        function fetchSiteInfoFallback(url, container) {
+            // Use DuckDuckGo API to get basic site info as a last resort
+            const query = new URL(url).hostname;
+            fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`)
+                .then(response => response.json())
+                .then(data => {
+                    const result = data.RelatedTopics.find(topic => topic.FirstURL.includes(query)) || {};
+                    const title = result.Text?.split(' - ')[0] || new URL(url).hostname;
+                    const description = result.Text || 'Unable to load content for this site. This may be due to security restrictions (e.g., CORS, X-Frame-Options) or connectivity issues.';
+                    const favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
+
+                    container.innerHTML = `
+                        <div class="siteContent">
+                            <a href="${url}" onclick="navigate('${url}'); return false;">${url}</a>
+                            <h3><img src="${favicon}" alt="Favicon" class="favicon">${title}</h3>
+                            <p>${description}</p>
+                            <p>Browser: Suuj Browser</p>
+                            <p>
+                                <a href="#" onclick="navigate('${url}'); return false;">Retry</a> |
+                                <a href="#" onclick="performSearch('${new URL(url).hostname}'); return false;">Search for alternatives</a> |
+                                <a href="${url}" onclick="navigate('${url}'); return false;">Visit site in Suuj Browser</a>
+                            </p>
+                            <button class="downloadAppBtn" onclick="downloadApp('${title}', '${url}')">Download as App</button>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching site info via DuckDuckGo:', error);
+                    const title = new URL(url).hostname;
+                    const favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
+                    container.innerHTML = `
+                        <div class="siteContent">
+                            <a href="${url}" onclick="navigate('${url}'); return false;">${url}</a>
+                            <h3><img src="${favicon}" alt="Favicon" class="favicon">${title}</h3>
+                            <p>Unable to load content for this site. This may be due to security restrictions (e.g., CORS, X-Frame-Options) or connectivity issues.</p>
+                            <p>Browser: Suuj Browser</p>
+                            <p>
+                                <a href="#" onclick="navigate('${url}'); return false;">Retry</a> |
+                                <a href="#" onclick="performSearch('${new URL(url).hostname}'); return false;">Search for alternatives</a> |
+                                <a href="${url}" onclick="navigate('${url}'); return false;">Visit site in Suuj Browser</a>
+                            </p>
+                            <button class="downloadAppBtn" onclick="downloadApp('${title}', '${url}')">Download as App</button>
+                        </div>
+                    `;
                 });
         }
 
         function renderSiteContent(url, container) {
             container.innerHTML = '<p>Loading content...</p>';
-            fetchWithFallback(url, container);
+            fetchWithProxies(url, container);
             updateNavigationButtons();
         }
 
