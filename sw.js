@@ -1,6 +1,6 @@
 const CACHE_NAME = 'suuj-browser-v1';
 const urlsToCache = [
-    'simple_browser.html'
+    'index.html'
 ];
 
 self.addEventListener('install', event => {
@@ -24,12 +24,12 @@ self.addEventListener('fetch', event => {
                     return response;
                 }
                 return fetch(event.request).catch(() => {
-                    return caches.match('simple_browser.html');
+                    return caches.match('index.html');
                 });
             })
             .catch(err => {
                 console.error('Fetch failed:', err);
-                return caches.match('simple_browser.html');
+                return caches.match('index.html');
             })
     );
 });
