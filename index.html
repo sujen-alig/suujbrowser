@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Browser</title>
+    <title>Advanced Simple Browser</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -14,6 +14,11 @@
             flex-direction: column;
             height: 100vh;
             color: #333;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: #ecf0f1;
         }
         #toolbar {
             background: #2c3e50;
@@ -23,6 +28,9 @@
             gap: 10px;
             flex-wrap: wrap;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        body.dark-mode #toolbar {
+            background: #1a252f;
         }
         #urlInput {
             flex: 1;
@@ -34,9 +42,16 @@
             min-width: 200px;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+        body.dark-mode #urlInput {
+            background: #34495e;
+            color: #ecf0f1;
+        }
         #urlInput:focus {
             outline: none;
             background: #fff;
+        }
+        body.dark-mode #urlInput:focus {
+            background: #4a6078;
         }
         #toolbar button {
             padding: 10px 20px;
@@ -58,12 +73,21 @@
         #downloadBtn:hover {
             background: #219653;
         }
+        #themeToggle {
+            background: #f1c40f;
+        }
+        #themeToggle:hover {
+            background: #d4ac0d;
+        }
         #tabsContainer {
             background: #34495e;
             padding: 5px;
             display: flex;
             gap: 5px;
             overflow-x: auto;
+        }
+        body.dark-mode #tabsContainer {
+            background: #1f2a38;
         }
         .tab {
             background: #7f8c8d;
@@ -78,13 +102,23 @@
             transition: background 0.3s;
             user-select: none;
         }
+        body.dark-mode .tab {
+            background: #95a5a6;
+        }
         .tab.active {
             background: #ecf0f1;
             color: #2c3e50;
             font-weight: bold;
         }
+        body.dark-mode .tab.active {
+            background: #2c3e50;
+            color: #ecf0f1;
+        }
         .tab:hover {
             background: #95a5a6;
+        }
+        body.dark-mode .tab:hover {
+            background: #b0bec5;
         }
         .tab .closeTab {
             background: #e74c3c;
@@ -108,6 +142,9 @@
             border-radius: 10px;
             margin: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode #browserWindow {
+            background: #2c3e50;
         }
         .iframeContainer {
             display: none;
@@ -140,7 +177,11 @@
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        #searchResults, #newTabPage {
+        body.dark-mode #error {
+            background: #e74c3c;
+            color: #ecf0f1;
+        }
+        #searchResults, #newTabPage, #historyPanel, #bookmarksPanel {
             display: none;
             position: absolute;
             top: 0;
@@ -153,6 +194,12 @@
             box-sizing: border-box;
             border-radius: 10px;
         }
+        body.dark-mode #searchResults,
+        body.dark-mode #newTabPage,
+        body.dark-mode #historyPanel,
+        body.dark-mode #bookmarksPanel {
+            background: #34495e;
+        }
         #newTabPage {
             display: flex;
             flex-direction: column;
@@ -163,6 +210,9 @@
         #newTabPage h2 {
             color: #2c3e50;
             margin-bottom: 20px;
+        }
+        body.dark-mode #newTabPage h2 {
+            color: #ecf0f1;
         }
         .quickLink {
             display: inline-block;
@@ -177,27 +227,67 @@
         .quickLink:hover {
             background: #2980b9;
         }
-        .searchResult {
+        .searchResult, .historyItem, .bookmarkItem {
             margin-bottom: 20px;
             padding: 10px;
             border-left: 3px solid #3498db;
         }
-        .searchResult h3 {
+        body.dark-mode .searchResult,
+        body.dark-mode .historyItem,
+        body.dark-mode .bookmarkItem {
+            border-left-color: #74ebd5;
+        }
+        .searchResult h3, .historyItem h3, .bookmarkItem h3 {
             margin: 0;
             font-size: 18px;
             color: #1a0dab;
             cursor: pointer;
         }
-        .searchResult h3:hover {
+        body.dark-mode .searchResult h3,
+        body.dark-mode .historyItem h3,
+        body.dark-mode .bookmarkItem h3 {
+            color: #74ebd5;
+        }
+        .searchResult h3:hover, .historyItem h3:hover, .bookmarkItem h3:hover {
             text-decoration: underline;
         }
-        .searchResult p {
+        .searchResult p, .historyItem p, .bookmarkItem p {
             margin: 5px 0;
             color: #545454;
         }
-        .searchResult a {
+        body.dark-mode .searchResult p,
+        body.dark-mode .historyItem p,
+        body.dark-mode .bookmarkItem p {
+            color: #b0bec5;
+        }
+        .searchResult a, .historyItem a, .bookmarkItem a {
             color: #006621;
             font-size: 14px;
+        }
+        body.dark-mode .searchResult a,
+        body.dark-mode .historyItem a,
+        body.dark-mode .bookmarkItem a {
+            color: #2ecc71;
+        }
+        .bookmarkItem button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .bookmarkItem button:hover {
+            background: #c0392b;
+        }
+        .retryLink {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .retryLink:hover {
+            color: #2980b9;
         }
     </style>
 </head>
@@ -207,9 +297,11 @@
         <button onclick="goForward()">Forward</button>
         <button onclick="refresh()">Refresh</button>
         <button onclick="newTab()">New Tab</button>
-        <button onclick="restoreTabs()">Restore Tabs</button>
-        <button onclick="backupTabs()">Backup Tabs</button>
+        <button onclick="showHistory()">History</button>
+        <button onclick="showBookmarks()">Bookmarks</button>
+        <button onclick="bookmarkCurrentPage()">Bookmark</button>
         <button id="downloadBtn" onclick="downloadPage()">Download Page</button>
+        <button id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
         <input type="text" id="urlInput" placeholder="Enter URL or search query..." onkeydown="if(event.key === 'Enter') searchOrNavigate()">
     </div>
     <div id="tabsContainer"></div>
@@ -217,34 +309,60 @@
         <div id="error"></div>
         <div id="searchResults"></div>
         <div id="newTabPage">
-            <h2>Welcome to Simple Browser</h2>
+            <h2>Welcome to Advanced Simple Browser</h2>
             <div>
-                <a href="https://www.example.com" class="quickLink" onclick="navigate('https://www.example.com'); return false;">Example</a>
-                <a href="https://www.wikipedia.org" class="quickLink" onclick="navigate('https://www.wikipedia.org'); return false;">Wikipedia</a>
-                <a href="https://www.github.com" class="quickLink" onclick="navigate('https://www.github.com'); return false;">GitHub</a>
-                <a href="https://www.stackoverflow.com" class="quickLink" onclick="navigate('https://www.stackoverflow.com'); return false;">Stack Overflow</a>
+                <a href="#" class="quickLink" onclick="navigate('https://www.example.com'); return false;">Example</a>
+                <a href="#" class="quickLink" onclick="navigate('https://www.wikipedia.org'); return false;">Wikipedia</a>
+                <a href="#" class="quickLink" onclick="navigate('https://www.github.com'); return false;">GitHub</a>
+                <a href="#" class="quickLink" onclick="navigate('https://www.stackoverflow.com'); return false;">Stack Overflow</a>
             </div>
         </div>
+        <div id="historyPanel"></div>
+        <div id="bookmarksPanel"></div>
     </div>
 
     <script>
         let tabs = [];
         let currentTabIndex = -1;
+        let historyList = JSON.parse(localStorage.getItem('browserHistory')) || [];
+        let bookmarks = JSON.parse(localStorage.getItem('browserBookmarks')) || [];
 
         // Expanded mock search results database
         const mockSearchResults = [
-            { url: "https://www.example.com", title: "Example Domain", description: "This domain is for use in illustrative examples in documents. You may use this domain in examples without prior coordination." },
-            { url: "https://www.wikipedia.org", title: "Wikipedia", description: "Wikipedia is a free online encyclopedia, created and edited by volunteers around the world. It offers information on a wide range of topics." },
-            { url: "https://www.github.com", title: "GitHub", description: "GitHub is a platform for version control and collaborative software development. It allows multiple users to work on projects simultaneously." },
-            { url: "https://www.stackoverflow.com", title: "Stack Overflow", description: "Stack Overflow is a question and answer site for professional and enthusiast programmers. It’s a great place to get coding help." },
-            { url: "https://www.w3schools.com", title: "W3Schools", description: "W3Schools offers free online tutorials, references, and exercises in all the major web technologies like HTML, CSS, and JavaScript." },
-            { url: "https://www.bbc.com", title: "BBC", description: "The British Broadcasting Corporation provides news, entertainment, and educational content globally through its website and media outlets." },
-            { url: "https://www.khanacademy.org", title: "Khan Academy", description: "Khan Academy offers free online courses, lessons, and practice in subjects like math, science, and history for learners of all ages." }
+            { url: "https://www.google.com", title: "Google", description: "Google Search, a web search engine developed by Google, offering search results and services. Note: This site may not load due to security restrictions." },
+            { url: "https://www.example.com", title: "Example Domain", description: "This domain is for use in illustrative examples in documents." },
+            { url: "https://www.wikipedia.org", title: "Wikipedia", description: "Wikipedia is a free online encyclopedia, created and edited by volunteers around the world." },
+            { url: "https://www.github.com", title: "GitHub", description: "GitHub is a platform for version control and collaborative software development." },
+            { url: "https://www.stackoverflow.com", title: "Stack Overflow", description: "Stack Overflow is a question and answer site for professional and enthusiast programmers." },
+            { url: "https://www.w3schools.com", title: "W3Schools", description: "W3Schools offers free online tutorials, references, and exercises in web technologies." },
+            { url: "https://www.bbc.com", title: "BBC", description: "The British Broadcasting Corporation provides news, entertainment, and educational content." },
+            { url: "https://www.khanacademy.org", title: "Khan Academy", description: "Khan Academy offers free online courses, lessons, and practice in various subjects." },
+            { url: "https://www.scholarships.com", title: "Scholarships.com", description: "Find scholarships, grants, and financial aid for students of all levels." },
+            { url: "https://www.fastweb.com", title: "Fastweb Scholarships", description: "Fastweb helps students find scholarships and financial aid for college." },
+            { url: "https://www.chegg.com/scholarships", title: "Chegg Scholarships", description: "Chegg offers a variety of scholarships for high school and college students." },
+            { url: "https://www.unigo.com", title: "Unigo Scholarships", description: "Unigo provides scholarship opportunities and college search tools for students." },
+            { url: "https://www.cappex.com", title: "Cappex Scholarships", description: "Cappex connects students with scholarships and colleges that match their interests." },
+            { url: "https://www.scholarshipowl.com", title: "ScholarshipOwl", description: "ScholarshipOwl automates the scholarship application process for students." },
+            { url: "https://www.niche.com/scholarships", title: "Niche Scholarships", description: "Niche offers scholarships and helps students find the right college." },
+            { url: "https://www.petersons.com/scholarships", title: "Peterson's Scholarships", description: "Peterson's provides scholarship search tools for students pursuing higher education." },
+            { url: "https://www.youtube.com", title: "YouTube", description: "YouTube is a global online video-sharing and social media platform. Note: This site may not load due to security restrictions." },
+            { url: "https://www.reddit.com", title: "Reddit", description: "Reddit is a social news aggregation, web content rating, and discussion website." },
+            { url: "https://www.quora.com", title: "Quora", description: "Quora is a question-and-answer website where users can ask and answer questions." },
+            { url: "https://www.medium.com", title: "Medium", description: "Medium is an online publishing platform where users can read and write articles." },
+            { url: "https://www.amazon.com", title: "Amazon", description: "Amazon is an online marketplace for shopping, cloud computing, and more." },
+            { url: "https://www.netflix.com", title: "Netflix", description: "Netflix is a streaming service for movies, TV shows, and original content. Note: This site may not load due to security restrictions." },
+            { url: "https://www.twitter.com", title: "Twitter", description: "Twitter is a social media platform for sharing and networking. Note: This site may not load due to security restrictions." },
+            { url: "https://www.facebook.com", title: "Facebook", description: "Facebook is a social networking site for connecting with friends and family. Note: This site may not load due to security restrictions." }
         ];
 
-        // Load saved tabs on page load
+        // Load saved tabs and theme on page load
         window.onload = function() {
             const savedTabs = localStorage.getItem('browserTabs');
+            const savedTheme = localStorage.getItem('browserTheme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeToggle').textContent = 'Light Mode';
+            }
             if (savedTabs) {
                 tabs = JSON.parse(savedTabs);
                 if (tabs.length > 0) {
@@ -257,14 +375,14 @@
             } else {
                 showNewTabPage();
             }
-
-            // Make tabs draggable
             makeTabsDraggable();
         };
 
         function showNewTabPage() {
-            document.getElementById('newTabPage').style.display = 'block';
+            document.getElementById('newTabPage').style.display = 'flex';
             document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('historyPanel').style.display = 'none';
+            document.getElementById('bookmarksPanel').style.display = 'none';
             document.querySelectorAll('.iframeContainer').forEach(container => {
                 container.classList.remove('active');
             });
@@ -360,6 +478,8 @@
 
             document.getElementById('newTabPage').style.display = 'none';
             document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('historyPanel').style.display = 'none';
+            document.getElementById('bookmarksPanel').style.display = 'none';
 
             if (tab.url === 'about:newtab') {
                 showNewTabPage();
@@ -367,10 +487,16 @@
                 const iframeContainer = document.getElementById(`iframe-${tab.id}`);
                 iframeContainer.classList.add('active');
                 const iframe = iframeContainer.querySelector('iframe');
-                iframe.onload = () => hideError();
+                let loadTimeout = setTimeout(() => {
+                    showError(`Failed to load ${tab.url}. This site may block embedding. <span class="retryLink" onclick="navigate('${tab.url}')">Try again</span> or search for the site to see more details.`);
+                }, 3000);
+                iframe.onload = () => {
+                    clearTimeout(loadTimeout);
+                    hideError();
+                };
                 iframe.onerror = () => {
-                    showError(`Failed to load ${tab.url}. The site may block embedding. Click to open in a new tab.`);
-                    iframeContainer.onclick = () => window.open(tab.url, '_blank');
+                    clearTimeout(loadTimeout);
+                    showError(`Failed to load ${tab.url}. This site may block embedding. <span class="retryLink" onclick="navigate('${tab.url}')">Try again</span> or search for the site to see more details.`);
                 };
             }
 
@@ -419,17 +545,24 @@
             searchResultsDiv.style.display = 'block';
 
             document.getElementById('newTabPage').style.display = 'none';
+            document.getElementById('historyPanel').style.display = 'none';
+            document.getElementById('bookmarksPanel').style.display = 'none';
             document.querySelectorAll('.iframeContainer').forEach(container => {
                 container.classList.remove('active');
             });
 
             const results = mockSearchResults.filter(result => 
                 result.title.toLowerCase().includes(query.toLowerCase()) || 
-                result.description.toLowerCase().includes(query.toLowerCase())
+                result.description.toLowerCase().includes(query.toLowerCase()) ||
+                result.url.toLowerCase().includes(query.toLowerCase())
             );
 
             if (results.length === 0) {
-                searchResultsDiv.innerHTML = '<p>No results found. Try a different query.</p>';
+                searchResultsDiv.innerHTML = `
+                    <p>No results found for "${query}".</p>
+                    <p>Try navigating to the site directly by entering its URL (e.g., https://${query}.com):</p>
+                    <p><span class="retryLink" onclick="navigate('https://${query}.com')">Navigate to https://${query}.com</span></p>
+                `;
                 return;
             }
 
@@ -468,15 +601,32 @@
             tab.history.push(url);
             tab.historyIndex = tab.history.length - 1;
 
+            // Add to history
+            const siteInfo = mockSearchResults.find(result => result.url === url) || {};
+            historyList.push({
+                url: url,
+                title: siteInfo.title || new URL(url).hostname,
+                timestamp: new Date().toLocaleString()
+            });
+            localStorage.setItem('browserHistory', JSON.stringify(historyList));
+
             document.getElementById('urlInput').value = url;
             document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('historyPanel').style.display = 'none';
+            document.getElementById('bookmarksPanel').style.display = 'none';
             renderTabs();
             backupTabs();
 
-            iframe.onload = () => hideError();
+            let loadTimeout = setTimeout(() => {
+                showError(`Failed to load ${url}. This site may block embedding. <span class="retryLink" onclick="navigate('${url}')">Try again</span> or search for the site to see more details.`);
+            }, 3000);
+            iframe.onload = () => {
+                clearTimeout(loadTimeout);
+                hideError();
+            };
             iframe.onerror = () => {
-                showError(`Failed to load ${url}. The site may block embedding. Click to open in a new tab.`);
-                document.getElementById(`iframe-${tab.id}`).onclick = () => window.open(url, '_blank');
+                clearTimeout(loadTimeout);
+                showError(`Failed to load ${url}. This site may block embedding. <span class="retryLink" onclick="navigate('${url}')">Try again</span> or search for the site to see more details.`);
             };
         }
 
@@ -555,7 +705,7 @@ URL: ${tab.url}
 Title: ${siteInfo.title || 'Unknown'}
 Description: ${siteInfo.description || 'No description available.'}
 
-Note: Direct content download is restricted due to security policies. Visit the URL to download content manually.
+Note: Direct content download is restricted due to security policies.
                 `;
                 const blob = new Blob([content], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
@@ -568,14 +718,104 @@ Note: Direct content download is restricted due to security policies. Visit the 
                 URL.revokeObjectURL(url);
             } catch (error) {
                 console.error('Error downloading page:', error);
-                showError('Error downloading page info. Visit the URL to download manually.');
+                showError('Error downloading page info.');
             }
+        }
+
+        function showHistory() {
+            const historyPanel = document.getElementById('historyPanel');
+            historyPanel.innerHTML = '<h2>Browsing History</h2>';
+            historyPanel.style.display = 'block';
+
+            document.getElementById('newTabPage').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('bookmarksPanel').style.display = 'none';
+            document.querySelectorAll('.iframeContainer').forEach(container => {
+                container.classList.remove('active');
+            });
+
+            if (historyList.length === 0) {
+                historyPanel.innerHTML += '<p>No history available.</p>';
+                return;
+            }
+
+            historyList.forEach(item => {
+                const historyDiv = document.createElement('div');
+                historyDiv.className = 'historyItem';
+                historyDiv.innerHTML = `
+                    <a href="${item.url}">${item.url}</a>
+                    <h3 onclick="navigate('${item.url}')">${item.title}</h3>
+                    <p>Visited: ${item.timestamp}</p>
+                `;
+                historyPanel.appendChild(historyDiv);
+            });
+        }
+
+        function showBookmarks() {
+            const bookmarksPanel = document.getElementById('bookmarksPanel');
+            bookmarksPanel.innerHTML = '<h2>Bookmarks</h2>';
+            bookmarksPanel.style.display = 'block';
+
+            document.getElementById('newTabPage').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('historyPanel').style.display = 'none';
+            document.querySelectorAll('.iframeContainer').forEach(container => {
+                container.classList.remove('active');
+            });
+
+            if (bookmarks.length === 0) {
+                bookmarksPanel.innerHTML += '<p>No bookmarks available.</p>';
+                return;
+            }
+
+            bookmarks.forEach((bookmark, index) => {
+                const bookmarkDiv = document.createElement('div');
+                bookmarkDiv.className = 'bookmarkItem';
+                bookmarkDiv.innerHTML = `
+                    <a href="${bookmark.url}">${bookmark.url}</a>
+                    <h3 onclick="navigate('${bookmark.url}')">${bookmark.title}</h3>
+                    <button onclick="removeBookmark(${index})">Remove</button>
+                `;
+                bookmarksPanel.appendChild(bookmarkDiv);
+            });
+        }
+
+        function bookmarkCurrentPage() {
+            const tab = tabs[currentTabIndex];
+            if (tab.url === 'about:newtab') {
+                showError('No page to bookmark. Navigate to a website first.');
+                return;
+            }
+
+            const siteInfo = mockSearchResults.find(result => result.url === tab.url) || {};
+            bookmarks.push({
+                url: tab.url,
+                title: siteInfo.title || new URL(tab.url).hostname
+            });
+            localStorage.setItem('browserBookmarks', JSON.stringify(bookmarks));
+            showBookmarks();
+        }
+
+        function removeBookmark(index) {
+            bookmarks.splice(index, 1);
+            localStorage.setItem('browserBookmarks', JSON.stringify(bookmarks));
+            showBookmarks();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+            localStorage.setItem('browserTheme', theme);
+            document.getElementById('themeToggle').textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
         }
 
         function showError(message) {
             const errorDiv = document.getElementById('error');
-            errorDiv.textContent = message;
+            errorDiv.innerHTML = message;
             errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
         }
 
         function hideError() {
