@@ -434,7 +434,7 @@
         let currentTabIndex = -1;
         let historyList = JSON.parse(localStorage.getItem('browserHistory')) || [];
         let bookmarks = JSON.parse(localStorage.getItem('browserBookmarks')) || [];
-        let searchCache = JSON.parse(localStorage.getItem('searchCache')) || {};
+        let searchCache = JSON.parse(localStorage.getItem('searchCache')) || [];
         let downloads = JSON.parse(localStorage.getItem('browserDownloads')) || [];
         let customHomepage = localStorage.getItem('customHomepage') || 'about:newtab';
         let isIncognito = false;
@@ -495,7 +495,7 @@
                         if (err.message.includes('security')) {
                             errorMessage += '\nEnsure you are accessing the browser via http://localhost or https:// (secure context required).';
                         } else if (err.message.includes('not found') || err.message.includes('404')) {
-                            errorMessage += '\nEnsure sw.js is in the same directory as simple_browser.html and is accessible at http://localhost:8000/sw.js.';
+                            errorMessage += '\nEnsure sw.js is in the same directory as simple_browser.html and is accessible at the hosted URL (e.g., via GitHub Pages).';
                         } else if (err.message.includes('scope')) {
                             errorMessage += '\nThere may be a scope mismatch. Ensure sw.js is in the correct directory and the scope ./ is appropriate.';
                         }
@@ -908,27 +908,9 @@
 
         function downloadSuujBrowserApp() {
             const siteName = "Suuj Browser";
-            const siteUrl = "http://localhost:8000/simple_browser.html"; // Adjust based on your hosting setup
-            const content = `App Download for ${siteName}\n\nFollow these steps to install Suuj Browser on your phone:\n1. Ensure your phone is on the same network as your laptop (if hosting locally).\n2. Open Chrome on your phone.\n3. Navigate to ${siteUrl}.\n4. Tap the three-dot menu in Chrome and select "Add to Home screen" (Android) or tap the share icon and select "Add to Home Screen" (iOS).\n5. Follow the prompts to add Suuj Browser to your home screen.\n\nNote: If you are not hosting locally, upload the files (simple_browser.html, manifest.json, sw.js) to a web server with HTTPS and access the URL from your phone.`;
-            
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${siteName.replace(/\s+/g, '_')}_app_install_instructions.txt`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-
-            if (!isIncognito) {
-                downloads.push({
-                    name: siteName,
-                    url: siteUrl,
-                    timestamp: new Date().toLocaleString()
-                });
-                localStorage.setItem('browserDownloads', JSON.stringify(downloads));
-            }
+            const githubPagesUrl = "https://your-username.github.io/your-repo/simple_browser.html"; // Replace with your actual GitHub Pages URL
+            const message = `Install ${siteName} on Your Phone:\n1. Open Chrome on your phone.\n2. Visit: ${githubPagesUrl}\n3. Tap the three-dot menu in Chrome and select "Add to Home screen" (Android) or tap the share icon and select "Add to Home Screen" (iOS).\n4. Follow the prompts to add Suuj Browser to your home screen.`;
+            showError(message);
         }
 
         function navigate(url) {
@@ -1323,7 +1305,7 @@
             errorDiv.style.display = 'block';
             setTimeout(() => {
                 errorDiv.style.display = 'none';
-            }, 5000);
+            }, 10000); // Increased to 10 seconds for readability of instructions
         }
     </script>
 </body>
