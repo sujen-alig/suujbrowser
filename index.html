@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Simple Browser</title>
+    <title>Suuj Browser</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -289,6 +289,18 @@
         .retryLink:hover {
             color: #2980b9;
         }
+        .downloadAppBtn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .downloadAppBtn:hover {
+            background: #219653;
+        }
     </style>
 </head>
 <body>
@@ -309,7 +321,7 @@
         <div id="error"></div>
         <div id="searchResults"></div>
         <div id="newTabPage">
-            <h2>Welcome to Advanced Simple Browser</h2>
+            <h2>Welcome to Suuj Browser</h2>
             <div>
                 <a href="#" class="quickLink" onclick="navigate('https://www.example.com'); return false;">Example</a>
                 <a href="#" class="quickLink" onclick="navigate('https://www.wikipedia.org'); return false;">Wikipedia</a>
@@ -327,32 +339,51 @@
         let historyList = JSON.parse(localStorage.getItem('browserHistory')) || [];
         let bookmarks = JSON.parse(localStorage.getItem('browserBookmarks')) || [];
 
-        // Expanded mock search results database
+        // Expanded mock search results database with app download links
         const mockSearchResults = [
-            { url: "https://www.google.com", title: "Google", description: "Google Search, a web search engine developed by Google, offering search results and services. Note: This site may not load due to security restrictions." },
-            { url: "https://www.example.com", title: "Example Domain", description: "This domain is for use in illustrative examples in documents." },
-            { url: "https://www.wikipedia.org", title: "Wikipedia", description: "Wikipedia is a free online encyclopedia, created and edited by volunteers around the world." },
-            { url: "https://www.github.com", title: "GitHub", description: "GitHub is a platform for version control and collaborative software development." },
-            { url: "https://www.stackoverflow.com", title: "Stack Overflow", description: "Stack Overflow is a question and answer site for professional and enthusiast programmers." },
-            { url: "https://www.w3schools.com", title: "W3Schools", description: "W3Schools offers free online tutorials, references, and exercises in web technologies." },
-            { url: "https://www.bbc.com", title: "BBC", description: "The British Broadcasting Corporation provides news, entertainment, and educational content." },
-            { url: "https://www.khanacademy.org", title: "Khan Academy", description: "Khan Academy offers free online courses, lessons, and practice in various subjects." },
-            { url: "https://www.scholarships.com", title: "Scholarships.com", description: "Find scholarships, grants, and financial aid for students of all levels." },
-            { url: "https://www.fastweb.com", title: "Fastweb Scholarships", description: "Fastweb helps students find scholarships and financial aid for college." },
-            { url: "https://www.chegg.com/scholarships", title: "Chegg Scholarships", description: "Chegg offers a variety of scholarships for high school and college students." },
-            { url: "https://www.unigo.com", title: "Unigo Scholarships", description: "Unigo provides scholarship opportunities and college search tools for students." },
-            { url: "https://www.cappex.com", title: "Cappex Scholarships", description: "Cappex connects students with scholarships and colleges that match their interests." },
-            { url: "https://www.scholarshipowl.com", title: "ScholarshipOwl", description: "ScholarshipOwl automates the scholarship application process for students." },
-            { url: "https://www.niche.com/scholarships", title: "Niche Scholarships", description: "Niche offers scholarships and helps students find the right college." },
-            { url: "https://www.petersons.com/scholarships", title: "Peterson's Scholarships", description: "Peterson's provides scholarship search tools for students pursuing higher education." },
-            { url: "https://www.youtube.com", title: "YouTube", description: "YouTube is a global online video-sharing and social media platform. Note: This site may not load due to security restrictions." },
-            { url: "https://www.reddit.com", title: "Reddit", description: "Reddit is a social news aggregation, web content rating, and discussion website." },
-            { url: "https://www.quora.com", title: "Quora", description: "Quora is a question-and-answer website where users can ask and answer questions." },
-            { url: "https://www.medium.com", title: "Medium", description: "Medium is an online publishing platform where users can read and write articles." },
-            { url: "https://www.amazon.com", title: "Amazon", description: "Amazon is an online marketplace for shopping, cloud computing, and more." },
-            { url: "https://www.netflix.com", title: "Netflix", description: "Netflix is a streaming service for movies, TV shows, and original content. Note: This site may not load due to security restrictions." },
-            { url: "https://www.twitter.com", title: "Twitter", description: "Twitter is a social media platform for sharing and networking. Note: This site may not load due to security restrictions." },
-            { url: "https://www.facebook.com", title: "Facebook", description: "Facebook is a social networking site for connecting with friends and family. Note: This site may not load due to security restrictions." }
+            { url: "https://www.google.com", title: "Google", description: "Google Search, a web search engine developed by Google.", appLink: "https://play.google.com/store/apps/details?id=com.google.android.googlequicksearchbox" },
+            { url: "https://www.example.com", title: "Example Domain", description: "This domain is for use in illustrative examples in documents.", appLink: null },
+            { url: "https://www.wikipedia.org", title: "Wikipedia", description: "Wikipedia is a free online encyclopedia, created and edited by volunteers.", appLink: "https://play.google.com/store/apps/details?id=org.wikipedia" },
+            { url: "https://www.github.com", title: "GitHub", description: "GitHub is a platform for version control and collaborative software development.", appLink: "https://play.google.com/store/apps/details?id=com.github.android" },
+            { url: "https://www.stackoverflow.com", title: "Stack Overflow", description: "Stack Overflow is a question and answer site for programmers.", appLink: null },
+            { url: "https://www.w3schools.com", title: "W3Schools", description: "W3Schools offers free online tutorials, references, and exercises in web technologies.", appLink: null },
+            { url: "https://www.bbc.com", title: "BBC", description: "The British Broadcasting Corporation provides news, entertainment, and educational content.", appLink: "https://play.google.com/store/apps/details?id=bbc.mobile.news.ww" },
+            { url: "https://www.khanacademy.org", title: "Khan Academy", description: "Khan Academy offers free online courses, lessons, and practice in various subjects.", appLink: "https://play.google.com/store/apps/details?id=org.khanacademy.android" },
+            { url: "https://www.scholarships.com", title: "Scholarships.com", description: "Find scholarships, grants, and financial aid for students.", appLink: null },
+            { url: "https://www.fastweb.com", title: "Fastweb Scholarships", description: "Fastweb helps students find scholarships and financial aid for college.", appLink: null },
+            { url: "https://www.chegg.com/scholarships", title: "Chegg Scholarships", description: "Chegg offers a variety of scholarships for high school and college students.", appLink: "https://play.google.com/store/apps/details?id=com.chegg" },
+            { url: "https://www.unigo.com", title: "Unigo Scholarships", description: "Unigo provides scholarship opportunities and college search tools.", appLink: null },
+            { url: "https://www.cappex.com", title: "Cappex Scholarships", description: "Cappex connects students with scholarships and colleges.", appLink: null },
+            { url: "https://www.scholarshipowl.com", title: "ScholarshipOwl", description: "ScholarshipOwl automates the scholarship application process for students.", appLink: null },
+            { url: "https://www.niche.com/scholarships", title: "Niche Scholarships", description: "Niche offers scholarships and helps students find the right college.", appLink: null },
+            { url: "https://www.petersons.com/scholarships", title: "Peterson's Scholarships", description: "Peterson's provides scholarship search tools for students.", appLink: null },
+            { url: "https://www.youtube.com", title: "YouTube", description: "YouTube is a global online video-sharing and social media platform.", appLink: "https://play.google.com/store/apps/details?id=com.google.android.youtube" },
+            { url: "https://www.reddit.com", title: "Reddit", description: "Reddit is a social news aggregation, web content rating, and discussion website.", appLink: "https://play.google.com/store/apps/details?id=com.reddit.frontpage" },
+            { url: "https://www.quora.com", title: "Quora", description: "Quora is a question-and-answer website where users can ask and answer questions.", appLink: "https://play.google.com/store/apps/details?id=com.quora.android" },
+            { url: "https://www.medium.com", title: "Medium", description: "Medium is an online publishing platform where users can read and write articles.", appLink: "https://play.google.com/store/apps/details?id=com.medium.reader" },
+            { url: "https://www.amazon.com", title: "Amazon", description: "Amazon is an online marketplace for shopping, cloud computing, and more.", appLink: "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping" },
+            { url: "https://www.netflix.com", title: "Netflix", description: "Netflix is a streaming service for movies, TV shows, and original content.", appLink: "https://play.google.com/store/apps/details?id=com.netflix.mediaclient" },
+            { url: "https://www.twitter.com", title: "Twitter", description: "Twitter is a social media platform for sharing and networking.", appLink: "https://play.google.com/store/apps/details?id=com.twitter.android" },
+            { url: "https://www.facebook.com", title: "Facebook", description: "Facebook is a social networking site for connecting with friends and family.", appLink: "https://play.google.com/store/apps/details?id=com.facebook.katana" },
+            { url: "https://www.instagram.com", title: "Instagram", description: "Instagram is a photo and video-sharing social networking service.", appLink: "https://play.google.com/store/apps/details?id=com.instagram.android" },
+            { url: "https://www.linkedin.com", title: "LinkedIn", description: "LinkedIn is a professional networking platform for job seekers and businesses.", appLink: "https://play.google.com/store/apps/details?id=com.linkedin.android" },
+            { url: "https://www.tiktok.com", title: "TikTok", description: "TikTok is a platform for creating and sharing short-form videos.", appLink: "https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically" },
+            { url: "https://www.snapchat.com", title: "Snapchat", description: "Snapchat is a multimedia messaging app with ephemeral messages.", appLink: "https://play.google.com/store/apps/details?id=com.snapchat.android" },
+            { url: "https://www.pinterest.com", title: "Pinterest", description: "Pinterest is a visual discovery engine for finding ideas like recipes, home decor, and more.", appLink: "https://play.google.com/store/apps/details?id=com.pinterest" },
+            { url: "https://www.ebay.com", title: "eBay", description: "eBay is an online marketplace for buying and selling goods.", appLink: "https://play.google.com/store/apps/details?id=com.ebay.mobile" },
+            { url: "https://www.walmart.com", title: "Walmart", description: "Walmart is a retail corporation offering a wide range of products online.", appLink: "https://play.google.com/store/apps/details?id=com.walmart.android" },
+            { url: "https://www.etsy.com", title: "Etsy", description: "Etsy is a marketplace for handmade, vintage, and unique items.", appLink: "https://play.google.com/store/apps/details?id=com.etsy.android" },
+            { url: "https://www.nytimes.com", title: "The New York Times", description: "The New York Times provides breaking news, multimedia, and opinion pieces.", appLink: "https://play.google.com/store/apps/details?id=com.nytimes.android" },
+            { url: "https://www.cnn.com", title: "CNN", description: "CNN delivers breaking news and in-depth reporting from around the world.", appLink: "https://play.google.com/store/apps/details?id=com.cnn.mobile.android.phone" },
+            { url: "https://www.theguardian.com", title: "The Guardian", description: "The Guardian offers independent journalism and global news coverage.", appLink: "https://play.google.com/store/apps/details?id=com.guardian" },
+            { url: "https://www.spotify.com", title: "Spotify", description: "Spotify is a music streaming service with millions of songs and podcasts.", appLink: "https://play.google.com/store/apps/details?id=com.spotify.music" },
+            { url: "https://www.apple.com/music", title: "Apple Music", description: "Apple Music is a streaming service for music and exclusive content.", appLink: "https://play.google.com/store/apps/details?id=com.apple.android.music" },
+            { url: "https://www.deezer.com", title: "Deezer", description: "Deezer is a music streaming service with a vast library of songs.", appLink: "https://play.google.com/store/apps/details?id=deezer.android.app" },
+            { url: "https://www.duolingo.com", title: "Duolingo", description: "Duolingo is a language-learning app with gamified lessons.", appLink: "https://play.google.com/store/apps/details?id=com.duolingo" },
+            { url: "https://www.coursera.org", title: "Coursera", description: "Coursera offers online courses, degrees, and certificates from top universities.", appLink: "https://play.google.com/store/apps/details?id=org.coursera.android" },
+            { url: "https://www.udemy.com", title: "Udemy", description: "Udemy provides online courses on a wide range of topics.", appLink: "https://play.google.com/store/apps/details?id=com.udemy.android" },
+            { url: "https://www.weather.com", title: "The Weather Channel", description: "The Weather Channel provides weather forecasts and updates.", appLink: "https://play.google.com/store/apps/details?id=com.weather.Weather" },
+            { url: "https://www.accuweather.com", title: "AccuWeather", description: "AccuWeather offers weather forecasts with minute-by-minute updates.", appLink: "https://play.google.com/store/apps/details?id=com.accuweather.android" }
         ];
 
         // Load saved tabs and theme on page load
@@ -486,7 +517,6 @@
             } else {
                 let iframeContainer = document.getElementById(`iframe-${tab.id}`);
                 if (!iframeContainer) {
-                    // If iframeContainer doesn't exist, create it
                     iframeContainer = document.createElement('div');
                     iframeContainer.className = 'iframeContainer';
                     iframeContainer.id = `iframe-${tab.id}`;
@@ -574,10 +604,17 @@
             );
 
             if (results.length === 0) {
+                const assumedUrl = `https://${query.replace(/\s+/g, '')}.com`;
                 searchResultsDiv.innerHTML = `
-                    <p>No results found for "${query}".</p>
-                    <p>Try navigating to the site directly by entering its URL (e.g., https://${query}.com):</p>
-                    <p><span class="retryLink" onclick="navigate('https://${query}.com')">Navigate to https://${query}.com</span></p>
+                    <p>No results found for "${query}" in Suuj Browser.</p>
+                    <p>Try navigating to the site directly:</p>
+                    <div class="searchResult">
+                        <a href="${assumedUrl}">${assumedUrl}</a>
+                        <h3 onclick="navigate('${assumedUrl}')">${query} (Assumed Site)</h3>
+                        <p>Browser: Suuj Browser</p>
+                        <p>This site may not be in our database. Navigate to explore it.</p>
+                        <button class="downloadAppBtn" onclick="downloadApp('${query}', '${assumedUrl}')">Download as App</button>
+                    </div>
                 `;
                 return;
             }
@@ -588,10 +625,28 @@
                 resultDiv.innerHTML = `
                     <a href="${result.url}">${result.url}</a>
                     <h3 onclick="navigate('${result.url}')">${result.title}</h3>
+                    <p>Browser: Suuj Browser</p>
                     <p>${result.description}</p>
+                    <button class="downloadAppBtn" onclick="downloadApp('${result.title}', '${result.url}', '${result.appLink || ''}')">Download as App</button>
                 `;
                 searchResultsDiv.appendChild(resultDiv);
             });
+        }
+
+        function downloadApp(siteName, siteUrl, appLink) {
+            const content = appLink ? 
+                `App Download for ${siteName}\n\nVisit the following link to download the app on your phone:\n${appLink}\n\nAlternatively, search for "${siteName}" in your phone's app store.` :
+                `App Download for ${siteName}\n\nNo app link available for this site.\nVisit ${siteUrl} on your phone and look for a mobile app option, or search for "${siteName}" in your phone's app store.`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${siteName.replace(/\s+/g, '_')}_app_info.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         function navigate(url) {
@@ -620,7 +675,6 @@
                 tab.history.push(url);
                 tab.historyIndex = tab.history.length - 1;
 
-                // Add to history
                 const siteInfo = mockSearchResults.find(result => result.url === url) || {};
                 historyList.push({
                     url: url,
