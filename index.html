@@ -401,6 +401,7 @@
         <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full transition transform hover:scale-105 text-sm" onclick="zoomOut()">Zoom Out</button>
         <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full transition transform hover:scale-105 text-sm" onclick="findInPage()">Find</button>
         <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full transition transform hover:scale-105 text-sm" onclick="clearData()">Clear Data</button>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-full transition transform hover:scale-105 text-sm" onclick="downloadSuujBrowserApp()">Download App</button>
         <button id="themeToggle" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full transition transform hover:scale-105 text-sm" onclick="toggleTheme()">Dark Mode</button>
         <input type="text" id="urlInput" class="focus:ring-2 focus:ring-blue-500" placeholder="Enter URL or search query..." onkeydown="if(event.key === 'Enter') searchOrNavigate()">
     </div>
@@ -444,7 +445,6 @@
             { url: 'https://api.allorigins.win/get?url=', name: 'AllOrigins' },
             { url: 'https://corsproxy.io/?', name: 'CorsProxyIO' },
             { url: 'https://thingproxy.freeboard.io/fetch/', name: 'ThingProxy' }
-            // Note: cors-anywhere.herokuapp.com requires hosting your own instance
         ];
 
         // Load saved tabs, theme, and user info on page load
@@ -476,14 +476,30 @@
         // Register Service Worker for PWA
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js', { scope: './' })
+                // Check if the service worker file exists
+                fetch('sw.js', { method: 'HEAD' })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Service Worker file not found or inaccessible (status: ${response.status})`);
+                        }
+                        // Proceed with registration
+                        return navigator.serviceWorker.register('sw.js', { scope: './' });
+                    })
                     .then(reg => {
-                        console.log('Service Worker registered', reg);
-                        showError('Service Worker registered successfully');
+                        console.log('Service Worker registered with scope:', reg.scope);
+                        showError('Service Worker registered successfully with scope: ' + reg.scope);
                     })
                     .catch(err => {
                         console.error('Service Worker registration failed:', err);
-                        showError(`Service Worker registration failed: ${err.message}`);
+                        let errorMessage = `Service Worker registration failed: ${err.message}`;
+                        if (err.message.includes('security')) {
+                            errorMessage += '\nEnsure you are accessing the browser via http://localhost or https:// (secure context required).';
+                        } else if (err.message.includes('not found') || err.message.includes('404')) {
+                            errorMessage += '\nEnsure sw.js is in the same directory as simple_browser.html and is accessible at http://localhost:8000/sw.js.';
+                        } else if (err.message.includes('scope')) {
+                            errorMessage += '\nThere may be a scope mismatch. Ensure sw.js is in the correct directory and the scope ./ is appropriate.';
+                        }
+                        showError(errorMessage);
                     });
             } else {
                 console.error('Service Workers not supported in this browser');
@@ -875,6 +891,31 @@
             const link = document.createElement('a');
             link.href = url;
             link.download = `${siteName.replace(/\s+/g, '_')}_app_info.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            if (!isIncognito) {
+                downloads.push({
+                    name: siteName,
+                    url: siteUrl,
+                    timestamp: new Date().toLocaleString()
+                });
+                localStorage.setItem('browserDownloads', JSON.stringify(downloads));
+            }
+        }
+
+        function downloadSuujBrowserApp() {
+            const siteName = "Suuj Browser";
+            const siteUrl = "http://localhost:8000/simple_browser.html"; // Adjust based on your hosting setup
+            const content = `App Download for ${siteName}\n\nFollow these steps to install Suuj Browser on your phone:\n1. Ensure your phone is on the same network as your laptop (if hosting locally).\n2. Open Chrome on your phone.\n3. Navigate to ${siteUrl}.\n4. Tap the three-dot menu in Chrome and select "Add to Home screen" (Android) or tap the share icon and select "Add to Home Screen" (iOS).\n5. Follow the prompts to add Suuj Browser to your home screen.\n\nNote: If you are not hosting locally, upload the files (simple_browser.html, manifest.json, sw.js) to a web server with HTTPS and access the URL from your phone.`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${siteName.replace(/\s+/g, '_')}_app_install_instructions.txt`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
