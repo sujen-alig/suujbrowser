@@ -2,7 +2,7 @@
     "name": "Suuj Browser",
     "short_name": "Suuj",
     "description": "A simple, modern web browser built with HTML and JavaScript.",
-    "start_url": "simple_browser.html",
+    "start_url": "index.html",
     "display": "standalone",
     "background_color": "#111827",
     "theme_color": "#111827",
