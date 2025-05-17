@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Browser</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            color: #333;
+        }
+        #toolbar {
+            background: #2c3e50;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #urlInput {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            background: #ecf0f1;
+            min-width: 200px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        #urlInput:focus {
+            outline: none;
+            background: #fff;
+        }
+        #toolbar button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            background: #3498db;
+            color: white;
+            transition: background 0.3s, transform 0.1s;
+        }
+        #toolbar button:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        #downloadBtn {
+            background: #27ae60;
+        }
+        #downloadBtn:hover {
+            background: #219653;
+        }
+        #tabsContainer {
+            background: #34495e;
+            padding: 5px;
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+        }
+        .tab {
+            background: #7f8c8d;
+            padding: 10px 20px;
+            border-radius: 15px 15px 0 0;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            transition: background 0.3s;
+            user-select: none;
+        }
+        .tab.active {
+            background: #ecf0f1;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        .tab:hover {
+            background: #95a5a6;
+        }
+        .tab .closeTab {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .tab .closeTab:hover {
+            background: #c0392b;
+        }
+        #browserWindow {
+            flex: 1;
+            position: relative;
+            background: #fff;
+            border-radius: 10px;
+            margin: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .iframeContainer {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .iframeContainer.active {
+            display: block;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+        }
+        #error {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f1c1c1;
+            padding: 20px;
+            border-radius: 8px;
+            color: #333;
+            font-size: 16px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #searchResults, #newTabPage {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 10px;
+        }
+        #newTabPage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        #newTabPage h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .quickLink {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #3498db;
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        .quickLink:hover {
+            background: #2980b9;
+        }
+        .searchResult {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-left: 3px solid #3498db;
+        }
+        .searchResult h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #1a0dab;
+            cursor: pointer;
+        }
+        .searchResult h3:hover {
+            text-decoration: underline;
+        }
+        .searchResult p {
+            margin: 5px 0;
+            color: #545454;
+        }
+        .searchResult a {
+            color: #006621;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <button onclick="goBack()">Back</button>
+        <button onclick="goForward()">Forward</button>
+        <button onclick="refresh()">Refresh</button>
+        <button onclick="newTab()">New Tab</button>
+        <button onclick="restoreTabs()">Restore Tabs</button>
+        <button onclick="backupTabs()">Backup Tabs</button>
+        <button id="downloadBtn" onclick="downloadPage()">Download Page</button>
+        <input type="text" id="urlInput" placeholder="Enter URL or search query..." onkeydown="if(event.key === 'Enter') searchOrNavigate()">
+    </div>
+    <div id="tabsContainer"></div>
+    <div id="browserWindow">
+        <div id="error"></div>
+        <div id="searchResults"></div>
+        <div id="newTabPage">
+            <h2>Welcome to Simple Browser</h2>
+            <div>
+                <a href="https://www.example.com" class="quickLink" onclick="navigate('https://www.example.com'); return false;">Example</a>
+                <a href="https://www.wikipedia.org" class="quickLink" onclick="navigate('https://www.wikipedia.org'); return false;">Wikipedia</a>
+                <a href="https://www.github.com" class="quickLink" onclick="navigate('https://www.github.com'); return false;">GitHub</a>
+                <a href="https://www.stackoverflow.com" class="quickLink" onclick="navigate('https://www.stackoverflow.com'); return false;">Stack Overflow</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tabs = [];
+        let currentTabIndex = -1;
+
+        // Expanded mock search results database
+        const mockSearchResults = [
+            { url: "https://www.example.com", title: "Example Domain", description: "This domain is for use in illustrative examples in documents. You may use this domain in examples without prior coordination." },
+            { url: "https://www.wikipedia.org", title: "Wikipedia", description: "Wikipedia is a free online encyclopedia, created and edited by volunteers around the world. It offers information on a wide range of topics." },
+            { url: "https://www.github.com", title: "GitHub", description: "GitHub is a platform for version control and collaborative software development. It allows multiple users to work on projects simultaneously." },
+            { url: "https://www.stackoverflow.com", title: "Stack Overflow", description: "Stack Overflow is a question and answer site for professional and enthusiast programmers. It’s a great place to get coding help." },
+            { url: "https://www.w3schools.com", title: "W3Schools", description: "W3Schools offers free online tutorials, references, and exercises in all the major web technologies like HTML, CSS, and JavaScript." },
+            { url: "https://www.bbc.com", title: "BBC", description: "The British Broadcasting Corporation provides news, entertainment, and educational content globally through its website and media outlets." },
+            { url: "https://www.khanacademy.org", title: "Khan Academy", description: "Khan Academy offers free online courses, lessons, and practice in subjects like math, science, and history for learners of all ages." }
+        ];
+
+        // Load saved tabs on page load
+        window.onload = function() {
+            const savedTabs = localStorage.getItem('browserTabs');
+            if (savedTabs) {
+                tabs = JSON.parse(savedTabs);
+                if (tabs.length > 0) {
+                    currentTabIndex = 0;
+                    renderTabs();
+                    switchTab(0);
+                } else {
+                    showNewTabPage();
+                }
+            } else {
+                showNewTabPage();
+            }
+
+            // Make tabs draggable
+            makeTabsDraggable();
+        };
+
+        function showNewTabPage() {
+            document.getElementById('newTabPage').style.display = 'block';
+            document.getElementById('searchResults').style.display = 'none';
+            document.querySelectorAll('.iframeContainer').forEach(container => {
+                container.classList.remove('active');
+            });
+        }
+
+        function newTab(url = null) {
+            const tabId = Date.now();
+            const tab = { id: tabId, url: url || 'about:newtab', history: [url || 'about:newtab'], historyIndex: 0 };
+            tabs.push(tab);
+            currentTabIndex = tabs.length - 1;
+
+            if (url) {
+                const iframeContainer = document.createElement('div');
+                iframeContainer.className = 'iframeContainer';
+                iframeContainer.id = `iframe-${tabId}`;
+                const iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.sandbox = 'allow-same-origin allow-scripts';
+                iframe.setAttribute('referrerpolicy', 'no-referrer');
+                iframeContainer.appendChild(iframe);
+                document.getElementById('browserWindow').appendChild(iframeContainer);
+            }
+
+            renderTabs();
+            switchTab(currentTabIndex);
+            backupTabs();
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            tabsContainer.innerHTML = '';
+            tabs.forEach((tab, index) => {
+                const tabElement = document.createElement('div');
+                tabElement.className = `tab ${index === currentTabIndex ? 'active' : ''}`;
+                tabElement.draggable = true;
+                tabElement.dataset.index = index;
+                tabElement.innerHTML = `
+                    <span onclick="switchTab(${index})">${tab.url === 'about:newtab' ? 'New Tab' : new URL(tab.url).hostname}</span>
+                    <span class="closeTab" onclick="closeTab(${index})">x</span>
+                `;
+                tabsContainer.appendChild(tabElement);
+            });
+        }
+
+        function makeTabsDraggable() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            let draggedTab = null;
+
+            tabsContainer.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('tab')) {
+                    draggedTab = e.target;
+                    e.target.style.opacity = '0.5';
+                }
+            });
+
+            tabsContainer.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('tab')) {
+                    e.target.style.opacity = '1';
+                    draggedTab = null;
+                }
+            });
+
+            tabsContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+
+            tabsContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const targetTab = e.target.closest('.tab');
+                if (targetTab && draggedTab && targetTab !== draggedTab) {
+                    const draggedIndex = parseInt(draggedTab.dataset.index);
+                    const targetIndex = parseInt(targetTab.dataset.index);
+                    const [movedTab] = tabs.splice(draggedIndex, 1);
+                    tabs.splice(targetIndex, 0, movedTab);
+                    currentTabIndex = tabs.findIndex(tab => tab.id === movedTab.id);
+                    renderTabs();
+                    switchTab(currentTabIndex);
+                }
+            });
+        }
+
+        function switchTab(index) {
+            if (index < 0 || index >= tabs.length) return;
+            currentTabIndex = index;
+            const tab = tabs[index];
+
+            document.querySelectorAll('.iframeContainer').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById('newTabPage').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'none';
+
+            if (tab.url === 'about:newtab') {
+                showNewTabPage();
+            } else {
+                const iframeContainer = document.getElementById(`iframe-${tab.id}`);
+                iframeContainer.classList.add('active');
+                const iframe = iframeContainer.querySelector('iframe');
+                iframe.onload = () => hideError();
+                iframe.onerror = () => {
+                    showError(`Failed to load ${tab.url}. The site may block embedding. Click to open in a new tab.`);
+                    iframeContainer.onclick = () => window.open(tab.url, '_blank');
+                };
+            }
+
+            document.getElementsByClassName('tab')[index].classList.add('active');
+            document.getElementById('urlInput').value = tab.url === 'about:newtab' ? '' : tab.url;
+        }
+
+        function closeTab(index) {
+            const tabId = tabs[index].id;
+            const iframeContainer = document.getElementById(`iframe-${tabId}`);
+            if (iframeContainer) iframeContainer.remove();
+            tabs.splice(index, 1);
+            if (tabs.length === 0) {
+                currentTabIndex = -1;
+                showNewTabPage();
+            } else {
+                if (currentTabIndex >= tabs.length) {
+                    currentTabIndex = tabs.length - 1;
+                }
+                switchTab(currentTabIndex);
+            }
+            renderTabs();
+            backupTabs();
+        }
+
+        function searchOrNavigate() {
+            const urlInput = document.getElementById('urlInput').value.trim();
+            if (!urlInput) return;
+
+            let url = urlInput;
+            if (!url.includes('.')) {
+                performSearch(url);
+                return;
+            }
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = `https://${url}`;
+            }
+
+            navigate(url);
+        }
+
+        function performSearch(query) {
+            const searchResultsDiv = document.getElementById('searchResults');
+            searchResultsDiv.innerHTML = '';
+            searchResultsDiv.style.display = 'block';
+
+            document.getElementById('newTabPage').style.display = 'none';
+            document.querySelectorAll('.iframeContainer').forEach(container => {
+                container.classList.remove('active');
+            });
+
+            const results = mockSearchResults.filter(result => 
+                result.title.toLowerCase().includes(query.toLowerCase()) || 
+                result.description.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (results.length === 0) {
+                searchResultsDiv.innerHTML = '<p>No results found. Try a different query.</p>';
+                return;
+            }
+
+            results.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'searchResult';
+                resultDiv.innerHTML = `
+                    <a href="${result.url}">${result.url}</a>
+                    <h3 onclick="navigate('${result.url}')">${result.title}</h3>
+                    <p>${result.description}</p>
+                `;
+                searchResultsDiv.appendChild(resultDiv);
+            });
+        }
+
+        function navigate(url) {
+            let tab = tabs[currentTabIndex];
+            if (tab.url === 'about:newtab') {
+                const tabId = tab.id;
+                const iframeContainer = document.createElement('div');
+                iframeContainer.className = 'iframeContainer';
+                iframeContainer.id = `iframe-${tabId}`;
+                const iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.sandbox = 'allow-same-origin allow-scripts';
+                iframe.setAttribute('referrerpolicy', 'no-referrer');
+                iframeContainer.appendChild(iframe);
+                document.getElementById('browserWindow').appendChild(iframeContainer);
+            }
+
+            tab.url = url;
+            const iframe = document.getElementById(`iframe-${tab.id}`).querySelector('iframe');
+            iframe.src = url;
+
+            tab.history = tab.history.slice(0, tab.historyIndex + 1);
+            tab.history.push(url);
+            tab.historyIndex = tab.history.length - 1;
+
+            document.getElementById('urlInput').value = url;
+            document.getElementById('searchResults').style.display = 'none';
+            renderTabs();
+            backupTabs();
+
+            iframe.onload = () => hideError();
+            iframe.onerror = () => {
+                showError(`Failed to load ${url}. The site may block embedding. Click to open in a new tab.`);
+                document.getElementById(`iframe-${tab.id}`).onclick = () => window.open(url, '_blank');
+            };
+        }
+
+        function goBack() {
+            const tab = tabs[currentTabIndex];
+            if (tab.historyIndex > 0) {
+                tab.historyIndex--;
+                tab.url = tab.history[tab.historyIndex];
+                const iframe = document.getElementById(`iframe-${tab.id}`).querySelector('iframe');
+                iframe.src = tab.url;
+                document.getElementById('urlInput').value = tab.url;
+                renderTabs();
+            }
+        }
+
+        function goForward() {
+            const tab = tabs[currentTabIndex];
+            if (tab.historyIndex < tab.history.length - 1) {
+                tab.historyIndex++;
+                tab.url = tab.history[tab.historyIndex];
+                const iframe = document.getElementById(`iframe-${tab.id}`).querySelector('iframe');
+                iframe.src = tab.url;
+                document.getElementById('urlInput').value = tab.url;
+                renderTabs();
+            }
+        }
+
+        function refresh() {
+            const tab = tabs[currentTabIndex];
+            if (tab.url === 'about:newtab') return;
+            const iframe = document.getElementById(`iframe-${tab.id}`).querySelector('iframe');
+            iframe.src = tab.url;
+        }
+
+        function backupTabs() {
+            localStorage.setItem('browserTabs', JSON.stringify(tabs));
+        }
+
+        function restoreTabs() {
+            const savedTabs = localStorage.getItem('browserTabs');
+            if (savedTabs) {
+                tabs = JSON.parse(savedTabs);
+                document.querySelectorAll('.iframeContainer').forEach(container => container.remove());
+                currentTabIndex = 0;
+                tabs.forEach(tab => {
+                    if (tab.url !== 'about:newtab') {
+                        const iframeContainer = document.createElement('div');
+                        iframeContainer.className = 'iframeContainer';
+                        iframeContainer.id = `iframe-${tab.id}`;
+                        const iframe = document.createElement('iframe');
+                        iframe.src = tab.url;
+                        iframe.sandbox = 'allow-same-origin allow-scripts';
+                        iframe.setAttribute('referrerpolicy', 'no-referrer');
+                        iframeContainer.appendChild(iframe);
+                        document.getElementById('browserWindow').appendChild(iframeContainer);
+                    }
+                });
+                renderTabs();
+                switchTab(0);
+            }
+        }
+
+        function downloadPage() {
+            const tab = tabs[currentTabIndex];
+            const errorDiv = document.getElementById('error');
+
+            if (tab.url === 'about:newtab') {
+                showError('No page to download. Navigate to a website first.');
+                return;
+            }
+
+            try {
+                const siteInfo = mockSearchResults.find(result => result.url === tab.url) || {};
+                const content = `
+URL: ${tab.url}
+Title: ${siteInfo.title || 'Unknown'}
+Description: ${siteInfo.description || 'No description available.'}
+
+Note: Direct content download is restricted due to security policies. Visit the URL to download content manually.
+                `;
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${new URL(tab.url).hostname || 'page'}_info.txt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading page:', error);
+                showError('Error downloading page info. Visit the URL to download manually.');
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            const errorDiv = document.getElementById('error');
+            errorDiv.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
